@@ -2,7 +2,7 @@
 layout: default
 nav: home
 title: Aryan Kashem
-description: Embedded firmware engineer, photographer, and sketch artist. Firmware, photography, sketches, and travel, gathered in one place.
+# All editorial copy for this page (hero, doors, meta) lives in _data/content.yml → home
 ---
 {%- comment -%}
   The home landing is "the collage": name + roles + one line, with the actual WORK
@@ -53,18 +53,17 @@ description: Embedded firmware engineer, photographer, and sketch artist. Firmwa
     <span class="sblob" style="--wash:var(--teal);   --l:54%; --t:53%; --s:250px; --o:.44; --dur:18s; --delay:-11s"></span>
   </div>
 
+  {%- comment -%} All hero copy + door labels live in _data/content.yml (site.data.content.home) {%- endcomment -%}
+  {%- assign home = site.data.content.home -%}
   <div class="stage__inner">
-    <p class="kick">firmware <b>·</b> photography <b>·</b> sketches <b>·</b> travel</p>
-    <h1 class="bigname">Aryan Kashem</h1>
-    <p class="lead">Embedded firmware engineer at Waterloo who shoots photos and draws.
-      Bare-metal systems by day; a camera and a sketchbook the rest of the time.</p>
+    <p class="kick">{{ home.kicker | replace: '·', '<b>·</b>' }}</p>
+    <h1 class="bigname">{{ home.name }}</h1>
+    <p class="lead">{{ home.lead }}</p>
 
     <nav class="enter" aria-label="Sections">
-      <a class="door" href="{{ '/blog/'         | relative_url }}" data-type="writing"    style="--wash:var(--lav)"><span>Blog</span><small>notes &amp; essays</small></a>
-      <a class="door" href="{{ '/photography/'  | relative_url }}" data-type="photo"      style="--wash:var(--sky)"><span>Photography</span><small>where I've been</small></a>
-      <a class="door" href="{{ '/art/'          | relative_url }}" data-type="sketch"     style="--wash:var(--peach)"><span>Sketches</span><small>graphite studies</small></a>
-      <a class="door" href="{{ '/projects/'     | relative_url }}" data-type="project"    style="--wash:var(--sage)"><span>Projects</span><small>firmware &amp; systems</small></a>
-      <a class="door" href="{{ '/experiences/'  | relative_url }}" data-type="experience" style="--wash:var(--gold)"><span>Experience</span><small>the résumé</small></a>
+      {%- for d in home.doors -%}
+      <a class="door" href="{{ d.url | relative_url }}" data-type="{{ d.type }}" style="--wash:var(--{{ d.wash }})"><span>{{ d.label }}</span><small>{{ d.sub }}</small></a>
+      {%- endfor -%}
     </nav>
   </div>
 </section>

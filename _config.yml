@@ -1,10 +1,8 @@
 # Site settings
 title: "Aryan Kashem"
-tagline: "Embedded firmware engineer, photographer, and sketch artist who travels."
+tagline: "Embedded firmware engineer, photographer, and artist"
 description: >-
-  Personal blog and portfolio of Aryan Kashem - embedded firmware engineer
-  (UWaterloo CE), photographer, and sketch artist. Technical writing on embedded
-  systems, finance, and life abroad, plus photography, sketches, and travel.
+  Personal blog and portfolio of Aryan Kashem
 url: "https://akashem06.github.io"
 baseurl: ""
 lang: en
@@ -14,8 +12,6 @@ author:
   github: "Akashem06"
 
 # Social / contact.
-# Email is intentionally NOT stored in plaintext (see CLAUDE.md); the footer
-# assembles it client-side from split parts instead (contact_user/contact_domain).
 social:
   github: "Akashem06"
   linkedin: "aryan-kashem" # https://www.linkedin.com/in/aryan-kashem/
@@ -69,8 +65,6 @@ exclude:
   - Gemfile
   - Gemfile.lock
   - CLAUDE.md
-  - CONTENT.md
-  - COPY-REVIEW.md
   - README.md
   - docs/
   - script/

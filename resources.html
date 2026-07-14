@@ -2,11 +2,12 @@
 layout: default
 nav: resources
 title: Resources
-description: Tools, references, and links Aryan Kashem recommends for embedded engineering, photography, and travel.
+# Editorial copy (eyebrow, lede, empty state, meta) lives in _data/content.yml → resources
 permalink: /resources/
 resources: []
 ---
-{% include masthead.html title="Resources" eyebrow="Toolbox" lede="Tools, references, and links I keep coming back to, for embedded work, photography, and travel." %}
+{%- assign copy = site.data.content.resources -%}
+{% include masthead.html title="Resources" eyebrow=copy.eyebrow lede=copy.lede %}
 
 <div class="container">
   {% if page.resources.size > 0 %}
@@ -19,6 +20,6 @@ resources: []
     {% endfor %}
   </div>
   {% else %}
-  <p class="muted">Resource list coming soon.</p>
+  <p class="muted">{{ copy.empty }}</p>
   {% endif %}
 </div>

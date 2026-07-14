@@ -1,0 +1,67 @@
+# =====================================================================
+#  SITE COPY  ·  the one file to edit for on-page words
+# =====================================================================
+#  This is the single source of truth for every editorial text field on
+#  the site: the home hero, the section doors, and each page's eyebrow,
+#  lede, intro, empty-state, and SEO meta description.
+#
+#  Edit the text here and it ships. You do NOT need to touch the .html
+#  files. (Site identity — your name, URL, socials — still lives in
+#  _config.yml. Blog posts, projects, experiences, and gallery items are
+#  their own files under _posts/ _projects/ _experiences/ _galleries/.)
+#
+#  Notes:
+#   - `meta`  = the description search engines and link previews show.
+#   - `>-`    = a folded multi-line string (wraps are collapsed to spaces).
+#   - Keep the quotes; they protect punctuation like the : and · chars.
+# =====================================================================
+
+home:
+  kicker: ""
+  name:   "Aryan Kashem"
+  lead: >-
+    Embedded firmware engineer at Waterloo who shoots photos and draws.
+    I enjoy Bare-metal systems and controls problems. I spend my free time with a camera and a sketchbook.
+  meta: "Embedded firmware engineer, photographer, and sketch artist. Firmware, photography, sketches, and travel, gathered in one place."
+  # The five section doors, in order. label/sub are yours to edit; url,
+  # type, and wash wire the color + hover behaviour (leave those alone
+  # unless you're moving a section).
+  doors:
+    - { label: "Blog",        sub: "notes & essays",     url: "/blog/",        type: "writing",    wash: "lav"   }
+    - { label: "Photography", sub: "where I've been",    url: "/photography/", type: "photo",      wash: "sky"   }
+    - { label: "Art",         sub: "my studies",         url: "/art/",         type: "art",        wash: "peach" }
+    - { label: "Projects",    sub: "firmware & systems", url: "/projects/",    type: "project",    wash: "sage"  }
+    - { label: "Experience",  sub: "the résumé",         url: "/experiences/", type: "experience", wash: "gold"  }
+
+blog:
+  lede:  "Notes on embedded systems, finance, and life abroad. The technical and the personal, side by side."
+  empty: "No posts yet. Check back soon."
+  meta:  "Technical and personal writing by Aryan Kashem."
+
+projects:
+  lede:  "My favorite firmware and electrical projects."
+  empty: "Projects are on the way."
+  meta:  "Embedded software and engineering projects."
+
+experiences:
+  lede:  "Roles and internships. The teams, the systems I worked on, and what I shipped."
+  empty: "Experience is on the way."
+  meta:  "My work history. Embedded firmware roles, internships, and the systems worked on."
+
+photography:
+  eyebrow: "Photography"
+  intro: >-
+    My favorite photos. Filter by place or trip with the chips or search to find a shot, then click any image to view it full size.
+  meta: "The whole collection, filterable by place and trip, viewable full-screen."
+
+art:
+  eyebrow: "Sketchbook"
+  intro: >-
+    Sketches and other artwork. Filter by kind with the chips or search, then click any piece to view it full size.
+  meta: "Realistic pencil sketches and other artworks. the whole collection, filterable by kind."
+
+resources:
+  eyebrow: "Toolbox"
+  lede:  "Tools, references, and links I keep coming back to."
+  empty: "Resource list coming soon."
+  meta:  "Tools, references, and links I recommend for embedded engineering, photography, and travel."

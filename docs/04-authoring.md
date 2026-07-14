@@ -15,6 +15,26 @@ by hand, through the **Front Matter CMS** editor, or (for photos) the **import t
 
 No build step to run by hand. If CI fails (see `docs/05-cicd.md`), the push is rejected before going live - fix and re-push.
 
+## Editing on-page copy (`_data/content.yml`)
+
+Everything that is *editorial text on a page* — the home hero and section-door
+labels, and each page's eyebrow / lede / intro / empty-state / SEO meta description —
+lives in one readable file: **`_data/content.yml`**, exposed to templates as
+`site.data.content`. Rewrite the strings there and they ship on the next build; the
+`.html` files pull from it and never hardcode this copy anymore.
+
+- Keyed by page: `home`, `blog`, `projects`, `experiences`, `photography`, `art`,
+  `resources`. `meta:` on each is the search / link-preview description.
+- The pages read it via `{% raw %}{% assign copy = site.data.content.<page> %}{% endraw %}`;
+  `seo.html` looks up the meta by `page.nav`; `gallery.html` looks it up by `page.bucket`.
+  A page's own front-matter `description:` still wins if set, so per-post overrides work.
+- This is *page chrome*, not content items — actual posts/projects/experiences/photos
+  keep their own frontmatter (schemas below). Site identity (name, URL, socials) stays
+  in `_config.yml`.
+
+(The old `COPY-REVIEW.md` and `CONTENT.md` worksheets drove nothing and were deleted
+when this became the source of truth.)
+
 ## Editor & tools
 
 These are conveniences for producing the same Markdown files described below — the

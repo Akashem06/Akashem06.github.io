@@ -8,7 +8,9 @@
 {%- else -%}
   {%- assign full_title = site.title -%}
 {%- endif -%}
-{%- assign seo_desc = page.description | default: page.summary | default: site.description -%}
+{%- comment -%} Page copy in _data/content.yml (keyed by nav) supplies the meta when front matter doesn't. {%- endcomment -%}
+{%- assign page_copy = site.data.content[page.nav] -%}
+{%- assign seo_desc = page.description | default: page_copy.meta | default: page.summary | default: site.description -%}
 {%- assign seo_image = page.image | default: site.default_image -%}
 
 <title>{{ full_title }}</title>

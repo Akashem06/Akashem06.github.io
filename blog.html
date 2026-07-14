@@ -2,12 +2,13 @@
 layout: default
 nav: blog
 title: Blog
-description: Technical and personal writing by Aryan Kashem on embedded systems, finance, and life abroad.
+# Editorial copy (lede, empty state, meta) lives in _data/content.yml → blog
 permalink: /blog/
 ---
+{%- assign copy = site.data.content.blog -%}
 {%- assign n = site.posts | size -%}
 {%- capture eyebrow -%}{{ n }} writing{% unless n == 1 %}s{% endunless %}{%- endcapture -%}
-{% include masthead.html title="Blog" eyebrow=eyebrow lede="Notes on embedded systems, finance, and life abroad — the technical and the personal, side by side." wide=true %}
+{% include masthead.html title="Blog" eyebrow=eyebrow lede=copy.lede wide=true %}
 
 <div class="container-wide">
   {% if site.posts.size > 0 %}
@@ -29,6 +30,6 @@ permalink: /blog/
     {% endfor %}
   </div>
   {% else %}
-  <p class="muted">No posts yet. Check back soon.</p>
+  <p class="muted">{{ copy.empty }}</p>
   {% endif %}
 </div>

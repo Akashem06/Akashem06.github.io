@@ -2,12 +2,13 @@
 layout: default
 nav: projects
 title: Projects
-description: Embedded firmware and engineering projects by Aryan Kashem - a few, well documented.
+# Editorial copy (lede, empty state, meta) lives in _data/content.yml → projects
 permalink: /projects/
 ---
+{%- assign copy = site.data.content.projects -%}
 {%- assign n = site.projects | size -%}
 {%- capture eyebrow -%}{{ n }} build{% unless n == 1 %}s{% endunless %}{%- endcapture -%}
-{% include masthead.html title="Projects" eyebrow=eyebrow lede="A few firmware and systems projects, written up properly instead of just listed." wide=true %}
+{% include masthead.html title="Projects" eyebrow=eyebrow lede=copy.lede wide=true %}
 
 <div class="container-wide">
   {% if site.projects.size > 0 %}
@@ -46,6 +47,6 @@ permalink: /projects/
     {% endfor %}
   </div>
   {% else %}
-  <p class="muted">Projects are on the way.</p>
+  <p class="muted">{{ copy.empty }}</p>
   {% endif %}
 </div>

@@ -9,14 +9,16 @@ layout: default
   wired by gallery.js + lightbox.js (loaded explicitly below — layout front matter
   does NOT set page.lightbox).
 {%- endcomment -%}
+{%- comment -%} Eyebrow + intro copy live in _data/content.yml (keyed by bucket). {%- endcomment -%}
+{%- assign gcopy = site.data.content[page.bucket] -%}
 {%- assign bucket_items = site.galleries | where: "bucket", page.bucket -%}
 {%- assign n = bucket_items | size -%}
 {%- if page.bucket == 'art' -%}{%- assign noun = 'piece' -%}{%- else -%}{%- assign noun = 'photo' -%}{%- endif -%}
-{%- capture eyebrow -%}{{ page.eyebrow | default: page.title }} · <span id="gallery-count" data-noun="{{ noun }}">{{ n }} {{ noun }}{% unless n == 1 %}s{% endunless %}</span>{%- endcapture -%}
+{%- capture eyebrow -%}{{ page.eyebrow | default: gcopy.eyebrow | default: page.title }} · <span id="gallery-count" data-noun="{{ noun }}">{{ n }} {{ noun }}{% unless n == 1 %}s{% endunless %}</span>{%- endcapture -%}
 {% include masthead.html title=page.title eyebrow=eyebrow wide=true %}
 
 <div class="container-wide gallery-page" data-bucket="{{ page.bucket }}">
-  <div class="page-lede">{{ content }}</div>
+  <div class="page-lede">{{ gcopy.intro | default: content }}</div>
   {%- if bucket_items == empty -%}
   <p class="muted gallery-empty">Nothing here yet. Check back soon.</p>
   {%- else -%}
