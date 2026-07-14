@@ -11,7 +11,9 @@ permalink: /blog/
 {% include masthead.html title="Blog" eyebrow=eyebrow lede=copy.lede wide=true %}
 
 <div class="container-wide">
-  {% if site.posts.size > 0 %}
+  {% if site.features.blog == false %}
+  <p class="muted">{{ copy.empty }}</p>
+  {% elsif site.posts.size > 0 %}
   {%- comment -%} Writing as a responsive 2-up card grid — the SAME `.pcard` the
     projects list uses, so blog and projects read as siblings. {%- endcomment -%}
   <div class="pcards g2" data-reveal>

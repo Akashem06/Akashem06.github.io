@@ -18,15 +18,12 @@ features:
 - Built a BLDC motor driver supporting back-EMF zero-crossing detection for sensorless
   control and Hall sensor feedback for sensored commutation.
 - Implemented discrete-time field-oriented control using Clarke and Park transforms
-- Space Vector Modulation
-- and PID current loops
-- achieving low torque ripple and high efficiency.
-- Added field-weakening by modulating the direct-axis current to reduce back-EMF
-- extending the RPM range without any hardware changes.
-- Designed a 4-layer PCB for 24V and 10A operation
-- with an optimized 3-phase inverter layout
-- high-voltage isolation
-- and a CAN interface for external speed control.
+  Space Vector Modulation, and PID current loops, achieving low torque ripple and
+  high efficiency.
+- Added field-weakening by modulating the direct-axis current to reduce back-EMF,
+  extending the RPM range without any hardware changes.
+- Designed a 4-layer PCB for 24V and 10A operation, with an optimized 3-phase inverter
+  layout, high-voltage isolation, and a CAN interface for external speed control.
 challenges: The field-oriented control loop runs at a fixed interrupt rate, so every
   Clarke transform, Park transform, and PID update has to complete within that window
   or the current regulation breaks down. Getting the discrete-time tuning right without
@@ -36,15 +33,15 @@ challenges: The field-oriented control loop runs at a fixed interrupt rate, so e
   design.
 image: /assets/images/projects/24v-motor-controller-field-oriented-control-and-6-block-commutation/cover.jpg
 gallery:
-- image: /assets/images/projects/24v-motor-controller-field-oriented-control-and-6-block-commutation/screenshot-2025-06-18-183116.jpg
+- alt: Motor Controller Architecture
+  image: /assets/images/projects/24v-motor-controller-field-oriented-control-and-6-block-commutation/screenshot-2025-06-18-183116.jpg
   thumb: /assets/images/projects/24v-motor-controller-field-oriented-control-and-6-block-commutation/thumb/screenshot-2025-06-18-183116.jpg
-  alt: Motor Controller Architecture
-- image: /assets/images/projects/24v-motor-controller-field-oriented-control-and-6-block-commutation/screenshot-2025-07-06-090038.jpg
+- alt: 6 Step
+  image: /assets/images/projects/24v-motor-controller-field-oriented-control-and-6-block-commutation/screenshot-2025-07-06-090038.jpg
   thumb: /assets/images/projects/24v-motor-controller-field-oriented-control-and-6-block-commutation/thumb/screenshot-2025-07-06-090038.jpg
-  alt: 6 Step
-- image: /assets/images/projects/24v-motor-controller-field-oriented-control-and-6-block-commutation/screenshot-2025-07-06-084951.jpg
+- alt: SVPWM
+  image: /assets/images/projects/24v-motor-controller-field-oriented-control-and-6-block-commutation/screenshot-2025-07-06-084951.jpg
   thumb: /assets/images/projects/24v-motor-controller-field-oriented-control-and-6-block-commutation/thumb/screenshot-2025-07-06-084951.jpg
-  alt: SVPWM
 featured: false
 date: '2025-03-01'
 ---

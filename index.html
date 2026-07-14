@@ -62,6 +62,7 @@ title: Aryan Kashem
 
     <nav class="enter" aria-label="Sections">
       {%- for d in home.doors -%}
+      {%- unless site.features.blog -%}{%- if d.url == '/blog/' -%}{%- continue -%}{%- endif -%}{%- endunless -%}
       <a class="door" href="{{ d.url | relative_url }}" data-type="{{ d.type }}" style="--wash:var(--{{ d.wash }})"><span>{{ d.label }}</span><small>{{ d.sub }}</small></a>
       {%- endfor -%}
     </nav>

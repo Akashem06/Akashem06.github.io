@@ -14,19 +14,17 @@ stack:
 - Raspberry Pi 4
 features:
 - Designed a complete Bluetooth LE host stack including host controller interface
-- generic access profile
-- and generic attribute profile layers
-- integrated directly into my Raspberry Pi 4 operating system.
+  (HCI), generic access profile (GAP), and generic attribute profile layers (GATT),
+  integrated directly into my Raspberry Pi 4 operating system.
 - Built a bare-metal host controller interface transport layer with Broadcom-specific
-  vendor extensions and event handling
-- enabling direct communication with the on-chip Bluetooth controller.
-- Implemented a full generic access profile layer covering targeted advertising
-- scanning
+  vendor extensions and event handling, enabling direct communication with the on-chip
+  Bluetooth controller.
+- Implemented a full generic access profile layer covering targeted advertising, scanning
 - and connection lifecycle management.
 - Engineered a generic attribute profile server and client architecture with the attribute
   protocol and service discovery.
-- Created a test suite validating protocol behavior across all stack layers
-- achieving reliable connectivity in under 7.3 seconds.
+- Created a test suite validating protocol behavior across all stack layers, achieving
+  reliable connectivity in under 7.3 seconds.
 challenges: The host controller interface transport on the Raspberry Pi 4 uses a Broadcom-specific
   UART protocol with vendor-defined opcodes and event codes that are not part of the
   public Bluetooth specification. Reverse engineering the initialization sequence

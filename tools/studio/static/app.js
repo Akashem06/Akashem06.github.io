@@ -70,6 +70,19 @@ async function loadList() {
 }
 
 // --- editor ----------------------------------------------------------------
+// Grow a textarea to fit its content so long fields (highlights, etc.) stay
+// legible without manual dragging. Keeps whatever min-height the `rows`
+// attribute sets, then expands past it as text is added.
+function autoGrow(ta) {
+  const fit = () => {
+    ta.style.height = "auto";
+    ta.style.height = ta.scrollHeight + 2 + "px";
+  };
+  ta.addEventListener("input", fit);
+  // Size once it's laid out (scrollHeight is 0 before it's in the DOM).
+  requestAnimationFrame(fit);
+}
+
 function fieldRow(field, value) {
   const id = `f-${field.name}`;
   const label = el("label", { htmlFor: id },
@@ -78,12 +91,14 @@ function fieldRow(field, value) {
 
   switch (field.type) {
     case "text":
-      input = el("textarea", { id, rows: 3, value: value || "" });
+      input = el("textarea", { id, rows: 4, value: value || "" });
+      autoGrow(input);
       break;
     case "list":
-      input = el("textarea", { id, rows: 2, placeholder: "one per line or comma-separated",
+      input = el("textarea", { id, rows: 4, placeholder: "one entry per line",
         value: Array.isArray(value) ? value.join("\n") : (value || "") });
       input.dataset.list = "1";
+      autoGrow(input);
       break;
     case "bool":
       input = el("input", { id, type: "checkbox", checked: !!value });

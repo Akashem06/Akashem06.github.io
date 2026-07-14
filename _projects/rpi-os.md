@@ -15,32 +15,17 @@ stack:
 - UART
 - FreeRTOS
 features:
-- Designed an ARM64 microkernel with a preemptive
-- priority-based round-robin scheduler supporting 64 concurrent tasks.
-- Implemented Linux-inspired abstractions including system calls
-- process control blocks
-- a boot script
-- ARM stub code
-- memory management
-- and a printf library.
-- Brought up peripheral drivers for I2C
-- SPI
-- PCM
-- I2S
-- UART
-- GPIO
-- and timers
-- with interrupt controller and interrupt service routine handling and clean kernel
-  entry and exit routines.
-- Implemented GPU communication through the VideoCore mailbox interface
-- supporting 32
-- '16'
-- and 8-bit framebuffers for graphics output.
-- Wrote ARM assembly for interrupt handling
-- context switching
-- the pre-main startup script
-- spinlocks
-- and safe peripheral register access.
+- Designed an ARM64 microkernel with a preemptive, priority-based round-robin scheduler
+  supporting 64 concurrent tasks.
+- Implemented Linux-inspired abstractions including system calls, process control
+  blocks, a boot script, ARM stub code, memory management, and a printf library.
+- Brought up peripheral drivers for I2C, SPI, PCM, I2S, UART, GPIO, and timers, with
+  interrupt controller and interrupt service routine handling and clean kernel entry
+  and exit routines.
+- Implemented GPU communication through the VideoCore mailbox interface, supporting
+  32, 16, and 8-bit framebuffers for graphics output.
+- Wrote ARM assembly for interrupt handling, context switching, the pre-main startup
+  script, spinlocks, and safe peripheral register access.
 - Built a Breakout game demo application using DMA-accelerated framebuffer uploads
 - boosting rendering throughput by 450%.
 challenges: Context switching in bare metal requires saving and restoring every general-purpose

@@ -14,31 +14,29 @@ stack:
 - Python
 - MATLAB
 features:
-- Designed firmware for a 5-node distributed system covering battery management
-- power distribution
-- and telemetry.
+- Designed firmware for a 5-node distributed system covering battery management, power
+  distribution, and telemetry.
 - Secured top 10 finishes at 2 annual competitions as the first Canadian single-occupant
-  vehicle team to pass scrutineering
-- with 0 electrical failures over 54 laps on a 3.15 mile track.
-- Built a hardware-in-the-loop vehicle mockup
-- cutting prototype validation time by 80%.
+  vehicle team to pass scrutineering, with 0 electrical failures over 54 laps on a
+  3.15 mile track.
+- Built a hardware-in-the-loop vehicle mockup, cutting prototype validation time by
+  80%.
 challenges: The hardest part of running a distributed system on a race vehicle is
   reliability under noise and vibration. Every node communicates over CAN, so any
   protocol inconsistency or missed message has cascading effects. Solving that required
-  careful scheduling, hardware-in-the-loop testing before any firmware went near the
-  car, and a software mockup that let us stress-test the full system topology on a
-  bench.
+  careful scheduling and a software mockup that let us stress-test the full system
+  topology on a bench.
 image: /assets/images/projects/solar-car-electrical-and-software-integration/cover.jpg
 gallery:
-- image: /assets/images/projects/solar-car-electrical-and-software-integration/ms16.jpg
+- alt: MS16
+  image: /assets/images/projects/solar-car-electrical-and-software-integration/ms16.jpg
   thumb: /assets/images/projects/solar-car-electrical-and-software-integration/thumb/ms16.jpg
-  alt: MS16
-- image: /assets/images/projects/solar-car-electrical-and-software-integration/solarcar3.jpg
+- alt: MS15
+  image: /assets/images/projects/solar-car-electrical-and-software-integration/solarcar3.jpg
   thumb: /assets/images/projects/solar-car-electrical-and-software-integration/thumb/solarcar3.jpg
-  alt: MS15
-- image: /assets/images/projects/solar-car-electrical-and-software-integration/solarcar.jpg
+- alt: MS15
+  image: /assets/images/projects/solar-car-electrical-and-software-integration/solarcar.jpg
   thumb: /assets/images/projects/solar-car-electrical-and-software-integration/thumb/solarcar.jpg
-  alt: MS15
 featured: true
 date: '2026-06-01'
 ---

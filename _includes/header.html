@@ -12,7 +12,7 @@
 
     <ul class="nav__tabs" id="nav-tabs">
       <li><a class="nav__tab" style="--wash: var(--teal)" href="{{ '/' | relative_url }}" {% if nav == 'home' %}aria-current="page"{% endif %}>Home</a></li>
-      <li><a class="nav__tab" style="--wash: var(--lav)" href="{{ '/blog/' | relative_url }}" {% if nav == 'blog' %}aria-current="page"{% endif %}>Blog</a></li>
+      {%- if site.features.blog %}<li><a class="nav__tab" style="--wash: var(--lav)" href="{{ '/blog/' | relative_url }}" {% if nav == 'blog' %}aria-current="page"{% endif %}>Blog</a></li>{% endif -%}
       <li><a class="nav__tab" style="--wash: var(--sky)" href="{{ '/projects/' | relative_url }}" {% if nav == 'projects' %}aria-current="page"{% endif %}>Projects</a></li>
       <li><a class="nav__tab" style="--wash: var(--sage)" href="{{ '/experiences/' | relative_url }}" {% if nav == 'experiences' %}aria-current="page"{% endif %}>Experience</a></li>
       <li><a class="nav__tab" style="--wash: var(--peach)" href="{{ '/photography/' | relative_url }}" {% if nav == 'photography' %}aria-current="page"{% endif %}>Photography</a></li>

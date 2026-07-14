@@ -16,15 +16,14 @@ stack:
 - Ethernet
 - Pre-silicon Validation
 highlights:
-- Authored firmware drivers for 7 ARM and RISC-V intellectual property blocks
-- producing reusable APIs that accelerated bringup across 4+ projects.
+- Authored firmware drivers for 7 ARM and RISC-V intellectual property blocks producing
+  reusable APIs that accelerated bringup across 4+ projects.
 - Identified 6 critical pre-tapeout bugs by achieving 98% test coverage on a Xilinx
-  Artix-7 FPGA
-- improving silicon reliability before fabrication.
+  Artix-7 FPGA, improving silicon reliability before fabrication.
 gallery:
-- image: /assets/images/experiences/onsemi/onsemidrivers.jpg
+- alt: Onsemi Drivers
+  image: /assets/images/experiences/onsemi/onsemidrivers.jpg
   thumb: /assets/images/experiences/onsemi/thumb/onsemidrivers.jpg
-  alt: Onsemi Drivers
 date: '2024-12-31'
 featured: false
 ---

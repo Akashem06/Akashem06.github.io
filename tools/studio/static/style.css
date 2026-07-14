@@ -169,7 +169,7 @@ input[type="text"], input[type="number"], input[type="date"], textarea, select {
   width: 100%;
 }
 input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--accent); }
-textarea { resize: vertical; }
+textarea { resize: vertical; min-height: 5.5em; line-height: 1.5; }
 input:focus, textarea:focus, select:focus { outline: 2px solid var(--accent); outline-offset: 1px; border-color: transparent; }
 
 .img-preview {

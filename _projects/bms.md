@@ -15,21 +15,16 @@ stack:
 - Simulink
 - CAN
 features:
-- Built LTC6811-based battery management firmware over isolated SPI
-- with passive balancing capable of discharging cells at roughly 0.5% state-of-charge
-  per hour
-- 16+ thermistor channels
-- and over-charge protection.
-- Designed a state-of-charge estimator using a 1-RC battery state space model
-- fusing Coulomb counting with voltage mapping via an extended Kalman filter
-- with autogeneration from MATLAB and Simulink.
-- Built a high-voltage test rig for balancing validation
-- state-of-charge mapping
-- and over/under-voltage and thermal fault injection across 20+ test cycles.
-- Implemented fault detection for voltage
-- temperature
-- and cell disconnect conditions
-- with CAN-based telemetry for remote diagnostics during testing and competition.
+- Built LTC6811-based battery management firmware over isolated SPI, with passive
+  balancing capable of discharging cells at roughly 0.5% state-of-charge per hour,
+  16+ thermistor channels, and over-charge protection.
+- Designed a state-of-charge estimator using a 1-RC battery state space model, fusing
+  Coulomb counting with voltage mapping via an extended Kalman filter, with autogeneration
+  from MATLAB and Simulink.
+- Built a high-voltage test rig for balancing validation, state-of-charge mapping,
+  and over/under-voltage and thermal fault injection across 20+ test cycles.
+- Implemented fault detection for voltage, temperature, and cell disconnect conditions,
+  with CAN-based telemetry for remote diagnostics during testing and competition.
 challenges: Designing the state-of-charge estimator was the hardest part. Open-circuit
   voltage mapping alone is too slow to track dynamic loads, and Coulomb counting alone
   drifts. The 1-RC state space model fuses both through an extended Kalman filter,
@@ -44,9 +39,9 @@ gallery:
 - alt: BMS Testing
   image: /assets/images/projects/battery-management-system-288-cells-150v-52a/bmstesting.jpg
   thumb: /assets/images/projects/battery-management-system-288-cells-150v-52a/thumb/bmstesting.jpg
-- image: /assets/images/projects/battery-management-system-288-cells-150v-52a/screenshot-2025-09-04-143938.jpg
+- alt: Cell Discharge Curves
+  image: /assets/images/projects/battery-management-system-288-cells-150v-52a/screenshot-2025-09-04-143938.jpg
   thumb: /assets/images/projects/battery-management-system-288-cells-150v-52a/thumb/screenshot-2025-09-04-143938.jpg
-  alt: Cell Discharge Curves
 featured: false
 date: '2025-01-01'
 ---

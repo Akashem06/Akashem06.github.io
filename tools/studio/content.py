@@ -126,7 +126,9 @@ def _coerce(kind: str, raw: dict) -> dict:
             if isinstance(val, list):
                 items = [str(x).strip() for x in val if str(x).strip()]
             else:
-                items = [p.strip() for p in re.split(r"[\n,]", str(val)) if p.strip()]
+                # Split on newlines only — one entry per line. Commas are kept
+                # literally so sentence-style entries (highlights) survive intact.
+                items = [p.strip() for p in str(val).split("\n") if p.strip()]
             if items:
                 meta[key] = items
         elif key in s["bools"]:

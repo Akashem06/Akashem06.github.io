@@ -20,8 +20,7 @@ features:
   rail
 - enabling diagnostics for auxiliary and DC/DC converter paths.
 - Implemented PCA9555 GPIO expander control over I2C to handle load enable
-- overcurrent protection responses
-- and rail multiplexing.
+- overcurrent protection responses, and rail multiplexing.
 challenges: The main challenge was sequencing. The 150V motor bus needs a controlled
   pre-charge before the main contactor closes, and the solar arrays need to be brought
   online in a specific order relative to the battery. Any timing error or missed state
@@ -33,9 +32,9 @@ gallery:
 - alt: Power Distribution Testing
   image: /assets/images/projects/power-distribution-unit-18-channels-12v-and-5v/powerdistribution.jpg
   thumb: /assets/images/projects/power-distribution-unit-18-channels-12v-and-5v/thumb/powerdistribution.jpg
-- image: /assets/images/projects/power-distribution-unit-18-channels-12v-and-5v/screenshot-2025-06-08-230011.jpg
+- alt: Power Distrubtion Arch
+  image: /assets/images/projects/power-distribution-unit-18-channels-12v-and-5v/screenshot-2025-06-08-230011.jpg
   thumb: /assets/images/projects/power-distribution-unit-18-channels-12v-and-5v/thumb/screenshot-2025-06-08-230011.jpg
-  alt: Power Distrubtion Arch
 featured: false
 date: '2024-12-01'
 ---
