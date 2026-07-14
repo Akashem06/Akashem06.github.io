@@ -1,0 +1,7 @@
+# Image processing (photo_tool.py, studio uploads)
+Pillow>=10.0
+# Terminal UI (photo_tui.py)
+textual>=0.60
+# Studio web app (studio/app.py)
+Flask>=3.0
+PyYAML>=6.0

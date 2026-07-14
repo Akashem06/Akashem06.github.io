@@ -1,0 +1,34 @@
+---
+layout: default
+nav: blog
+title: Blog
+description: Technical and personal writing by Aryan Kashem on embedded systems, finance, and life abroad.
+permalink: /blog/
+---
+{%- assign n = site.posts | size -%}
+{%- capture eyebrow -%}{{ n }} writing{% unless n == 1 %}s{% endunless %}{%- endcapture -%}
+{% include masthead.html title="Blog" eyebrow=eyebrow lede="Notes on embedded systems, finance, and life abroad — the technical and the personal, side by side." wide=true %}
+
+<div class="container-wide">
+  {% if site.posts.size > 0 %}
+  {%- comment -%} Writing as a responsive 2-up card grid — the SAME `.pcard` the
+    projects list uses, so blog and projects read as siblings. {%- endcomment -%}
+  <div class="pcards g2" data-reveal>
+    {% for post in site.posts %}
+    {%- assign hue = forloop.index | modulo: 8 | plus: 1 -%}
+    <a class="pcard" href="{{ post.url | relative_url }}">
+      <span class="pcard__cover ph--{{ hue }}" aria-hidden="true">{% if post.image %}<img src="{{ post.image | relative_url }}" alt="" loading="lazy" />{% endif %}</span>
+      <div class="pcard__body">
+        {% if post.categories %}<span class="pcard__chip">{{ post.categories | first }}</span>{% endif %}
+        <h3 class="pcard__title">{{ post.title }}</h3>
+        {% if post.description %}<p class="pcard__sub">{{ post.description }}</p>{% endif %}
+        <p class="pcard__stack">{{ post.date | date: "%b %-d, %Y" }}{% if post.read_time %} · {{ post.read_time }} min read{% endif %}</p>
+        <span class="pcard__year">{{ post.date | date: "%Y" }}</span>
+      </div>
+    </a>
+    {% endfor %}
+  </div>
+  {% else %}
+  <p class="muted">No posts yet. Check back soon.</p>
+  {% endif %}
+</div>

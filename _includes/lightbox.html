@@ -1,0 +1,57 @@
+{%- comment -%}
+  Lightbox overlay. Always dark regardless of site theme (docs/03 - deliberate exception).
+  Markup is inert until lightbox.js wires it to the gallery thumbnails.
+{%- endcomment -%}
+<div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Image viewer" hidden>
+  <div class="lightbox__backdrop" data-lightbox-close></div>
+
+  <button class="lightbox__btn lightbox__close" type="button" data-lightbox-close aria-label="Close">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+      <line x1="6" y1="6" x2="18" y2="18"></line>
+      <line x1="18" y1="6" x2="6" y2="18"></line>
+    </svg>
+  </button>
+
+  <button class="lightbox__btn lightbox__prev" type="button" data-lightbox-prev aria-label="Previous image">
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <polyline points="15 18 9 12 15 6"></polyline>
+    </svg>
+  </button>
+
+  <figure class="lightbox__figure">
+    <div class="lightbox__stage" id="lightbox-stage">
+      <img class="lightbox__img" id="lightbox-img" src="" alt="" draggable="false" />
+    </div>
+    <figcaption class="lightbox__caption">
+      <span class="lightbox__counter" id="lightbox-counter"></span>
+      <span class="lightbox__caption-text" id="lightbox-caption"></span>
+    </figcaption>
+  </figure>
+
+  <div class="lightbox__tools" role="group" aria-label="Image controls">
+    <button class="lightbox__btn lightbox__tool" type="button" data-lightbox-zoom-out aria-label="Zoom out">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+        <circle cx="11" cy="11" r="7"></circle><line x1="8" y1="11" x2="14" y2="11"></line><line x1="16.5" y1="16.5" x2="21" y2="21"></line>
+      </svg>
+    </button>
+    <button class="lightbox__btn lightbox__tool lightbox__zoom-reset" type="button" data-lightbox-zoom-reset aria-label="Reset zoom">
+      <span id="lightbox-zoom-level">100%</span>
+    </button>
+    <button class="lightbox__btn lightbox__tool" type="button" data-lightbox-zoom-in aria-label="Zoom in">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+        <circle cx="11" cy="11" r="7"></circle><line x1="11" y1="8" x2="11" y2="14"></line><line x1="8" y1="11" x2="14" y2="11"></line><line x1="16.5" y1="16.5" x2="21" y2="21"></line>
+      </svg>
+    </button>
+    <a class="lightbox__btn lightbox__tool lightbox__download" id="lightbox-download" data-lightbox-download download href="#" aria-label="Download image">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M12 3v12"></path><polyline points="7 11 12 16 17 11"></polyline><line x1="5" y1="21" x2="19" y2="21"></line>
+      </svg>
+    </a>
+  </div>
+
+  <button class="lightbox__btn lightbox__next" type="button" data-lightbox-next aria-label="Next image">
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </button>
+</div>

@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="{{ site.lang | default: 'en' }}">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <!--
+      Theme: set data-theme on <html> BEFORE the stylesheet loads so there is no
+      flash of the wrong theme. Uses the saved choice if present, else the OS
+      preference. The nav toggle (theme.js) updates and persists it. Also points
+      the mobile browser-chrome color at the active canvas. (see docs/01-visual)
+    -->
+    <meta name="theme-color" id="meta-theme-color" content="#f7f2e9" />
+    <script>
+      (function () {
+        try {
+          var saved = localStorage.getItem("theme");
+          var dark = saved
+            ? saved === "dark"
+            : window.matchMedia("(prefers-color-scheme: dark)").matches;
+          document.documentElement.setAttribute("data-theme", dark ? "dark" : "light");
+          var m = document.getElementById("meta-theme-color");
+          if (m) m.content = dark ? "#1c1815" : "#f7f2e9";
+        } catch (e) {}
+      })();
+    </script>
+
+    <!--
+      This inline script only gates the scroll-reveal: add the `reveal` class ONLY
+      when we can animate safely, so the CSS never hides [data-reveal] for no-JS /
+      reduced-motion visitors (they see content immediately). (see reveal.js, docs/01)
+    -->
+    <script>
+      (function () {
+        try {
+          if (
+            "IntersectionObserver" in window &&
+            !window.matchMedia("(prefers-reduced-motion: reduce)").matches
+          ) {
+            document.documentElement.classList.add("reveal");
+          }
+        } catch (e) {}
+      })();
+    </script>
+
+    {% include seo.html %}
+
+    <!-- Watercolor type (2026 pivot): Gloock (display) + Spectral (body) +
+         Spline Sans Mono (labels), from Google Fonts. Serif fallbacks hold the
+         layout while they swap in. -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Gloock&family=Spectral:ital,wght@0,300;0,400;0,500;0,600;1,400&family=Spline+Sans+Mono:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+
+    <link rel="stylesheet" href="{{ '/assets/css/main.css' | relative_url }}" />
+    <link rel="icon" href="{{ '/assets/favicon.svg' | relative_url }}" type="image/svg+xml" />
+    {% feed_meta %}
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+
+    <!-- Watercolor "bleed" filter (turbulence + displacement) — gives the hero
+         bloom AND the card hover washes their wet, ragged paint edges. Defined
+         once here so every page can url(#bleed) it. Inert: no network, 0×0, hidden. -->
+    <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+      <filter id="bleed">
+        <feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="3" result="n" />
+        <feDisplacementMap in="SourceGraphic" in2="n" scale="42" />
+      </filter>
+      <!-- Soft wet edge for the per-tab watercolor hover dab (wash tabs). Same
+           turbulence family as #bleed, dialed way down so the dab bleeds, not shreds. -->
+      <filter id="wash-bloom">
+        <feTurbulence type="fractalNoise" baseFrequency="0.03" numOctaves="2" seed="9" result="n" />
+        <feDisplacementMap in="SourceGraphic" in2="n" scale="11" />
+      </filter>
+    </svg>
+
+    <div class="grid" aria-hidden="true"></div>
+    <div class="grain" aria-hidden="true"></div>
+    {% include header.html %}
+
+    <main id="main">{{ content }}</main>
+
+    {% include footer.html %}
+    <script src="{{ '/assets/js/theme.js' | relative_url }}" defer></script>
+    <script src="{{ '/assets/js/reveal.js' | relative_url }}" defer></script>
+    {% if page.lightbox %}
+    <script src="{{ '/assets/js/lightbox.js' | relative_url }}" defer></script>
+    {% endif %}
+    {% if page.carousel %}
+    <script src="{{ '/assets/js/carousel.js' | relative_url }}" defer></script>
+    {% endif %}
+  </body>
+</html>

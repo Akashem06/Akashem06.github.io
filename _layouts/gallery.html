@@ -1,0 +1,75 @@
+---
+layout: default
+---
+{%- comment -%}
+  Bucket gallery: one page per bucket (page.bucket = "photography" | "art").
+  You land straight on the whole collage — every item in the bucket as one
+  masonry. Narrow it with the filter chips (one per album, "All" first) or the
+  live search; nothing drills into folders. All filtering + lightbox behaviour is
+  wired by gallery.js + lightbox.js (loaded explicitly below — layout front matter
+  does NOT set page.lightbox).
+{%- endcomment -%}
+{%- assign bucket_items = site.galleries | where: "bucket", page.bucket -%}
+{%- assign n = bucket_items | size -%}
+{%- if page.bucket == 'art' -%}{%- assign noun = 'piece' -%}{%- else -%}{%- assign noun = 'photo' -%}{%- endif -%}
+{%- capture eyebrow -%}{{ page.eyebrow | default: page.title }} · <span id="gallery-count" data-noun="{{ noun }}">{{ n }} {{ noun }}{% unless n == 1 %}s{% endunless %}</span>{%- endcapture -%}
+{% include masthead.html title=page.title eyebrow=eyebrow wide=true %}
+
+<div class="container-wide gallery-page" data-bucket="{{ page.bucket }}">
+  <div class="page-lede">{{ content }}</div>
+  {%- if bucket_items == empty -%}
+  <p class="muted gallery-empty">Nothing here yet. Check back soon.</p>
+  {%- else -%}
+
+  {%- assign groups = bucket_items | group_by: "album" -%}
+  {%- assign washes = "lav,peach,sage,sky,gold,rose,teal,tomato" | split: "," -%}
+  <div class="gallery-toolbar">
+    <div class="gallery-chips" id="gallery-chips" role="group" aria-label="Filter by album">
+      <button class="gchip is-active" type="button" data-album="all" style="--w: var(--lilac)">All <span class="n">{{ n }}</span></button>
+      {%- for g in groups -%}
+      {%- assign wi = forloop.index0 | modulo: washes.size -%}
+      <button class="gchip" type="button" data-album="{{ g.name | slugify }}" style="--w: var(--{{ washes[wi] }})">{{ g.name | default: "Untitled" }} <span class="n">{{ g.items | size }}</span></button>
+      {%- endfor -%}
+    </div>
+    <label class="gallery-search">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <circle cx="11" cy="11" r="8"></circle>
+        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+      </svg>
+      <input type="search" id="gallery-search" placeholder="Search {{ page.title | downcase }}…" aria-label="Search {{ page.title | downcase }}" autocomplete="off" />
+    </label>
+  </div>
+
+  <p class="gallery-empty muted" id="gallery-empty" hidden>Nothing matches. Try another word or clear the filter.</p>
+
+  {%- comment -%} The whole collage — every item, always present; filtered in place. {%- endcomment -%}
+  {%- assign items = bucket_items | sort: "date" | reverse -%}
+  <div class="masonry" id="gallery">
+    {%- for item in items -%}
+    {%- capture search_terms -%}{{ item.title }} {{ item.location }} {{ item.album }} {{ item.alt }}{% if item.featured %} featured{% endif %}{%- endcapture -%}
+    <figure class="masonry__item"
+      data-album="{{ item.album | slugify }}"
+      data-search="{{ search_terms | escape }}">
+      <a
+        class="thumb"
+        href="{{ item.image | relative_url }}"
+        data-caption="{{ item.title }}{% if item.location %} · {{ item.location }}{% endif %}"
+        aria-label="View: {{ item.alt | escape }}"
+      >
+        <img
+          src="{{ item.thumb | default: item.image | relative_url }}"
+          alt="{{ item.alt }}"
+          loading="lazy"
+        />
+        {% if item.title %}<figcaption class="thumb__caption">{{ item.title }}</figcaption>{% endif %}
+      </a>
+    </figure>
+    {%- endfor -%}
+  </div>
+
+  {%- endif -%}
+</div>
+
+{% include lightbox.html %}
+<script src="{{ '/assets/js/gallery.js' | relative_url }}" defer></script>
+<script src="{{ '/assets/js/lightbox.js' | relative_url }}" defer></script>

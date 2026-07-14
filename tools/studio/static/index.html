@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Studio — Aryan Kashem</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <span class="brand">Studio</span>
+      <nav class="tabs" id="tabs">
+        <button class="tab" data-kind="gallery">Gallery</button>
+        <button class="tab" data-kind="posts">Posts</button>
+        <button class="tab" data-kind="projects">Projects</button>
+        <button class="tab" data-kind="experiences">Experience</button>
+      </nav>
+      <span class="hint">writes Markdown to your repo · optimizes images on upload</span>
+    </header>
+
+    <main class="layout">
+      <aside class="list-pane">
+        <div class="list-head">
+          <h2 id="list-title">Gallery</h2>
+          <div class="list-head__actions">
+            <button class="btn" id="bulk-btn" hidden>⇪ Bulk</button>
+            <button class="btn btn--primary" id="new-btn">+ New</button>
+          </div>
+        </div>
+        <div class="cards" id="cards"></div>
+      </aside>
+
+      <section class="editor-pane" id="editor">
+        <p class="empty">Select an item to edit, or press <strong>+ New</strong>.</p>
+      </section>
+    </main>
+
+    <div class="toast" id="toast" hidden></div>
+
+    <script src="app.js"></script>
+  </body>
+</html>

@@ -1,0 +1,83 @@
+# Site settings
+title: "Aryan Kashem"
+tagline: "Embedded firmware engineer, photographer, and sketch artist who travels."
+description: >-
+  Personal blog and portfolio of Aryan Kashem - embedded firmware engineer
+  (UWaterloo CE), photographer, and sketch artist. Technical writing on embedded
+  systems, finance, and life abroad, plus photography, sketches, and travel.
+url: "https://akashem06.github.io"
+baseurl: ""
+lang: en
+author:
+  name: "Aryan Kashem"
+  # github handle is public-safe; other handles are TODO until provided
+  github: "Akashem06"
+
+# Social / contact.
+# Email is intentionally NOT stored in plaintext (see CLAUDE.md); the footer
+# assembles it client-side from split parts instead (contact_user/contact_domain).
+social:
+  github: "Akashem06"
+  linkedin: "aryan-kashem" # https://www.linkedin.com/in/aryan-kashem/
+  twitter: "aryan_ibk" # https://x.com/aryan_ibk
+contact_user: "akashem"
+contact_domain: "uwaterloo.ca"
+
+# Default OG/social preview image used when a page/post doesn't set its own.
+default_image: "/assets/images/og-default.png"
+
+# Build
+markdown: kramdown
+kramdown:
+  syntax_highlighter: rouge
+permalink: /blog/:year/:month/:day/:title/
+timezone: America/Toronto
+
+# Collections
+collections:
+  projects:
+    output: true
+    permalink: /projects/:name/
+  galleries:
+    output: false # gallery items are data, surfaced through gallery.html
+  experiences:
+    output: false # roles are surfaced as a timeline on experiences.html (no per-role pages)
+
+# Front-matter defaults
+defaults:
+  - scope:
+      path: ""
+      type: posts
+    values:
+      layout: post
+  - scope:
+      path: ""
+      type: projects
+    values:
+      layout: page
+
+# Plugins (auto-generate sitemap + RSS)
+plugins:
+  - jekyll-sitemap
+  - jekyll-feed
+
+feed:
+  path: feed.xml
+
+# Excluded from the build output
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - CLAUDE.md
+  - CONTENT.md
+  - COPY-REVIEW.md
+  - README.md
+  - docs/
+  - script/
+  - tools/
+  - vendor/
+  - "*.local.md"
+  - .github/
+  - frontmatter.json
+  - .frontmatter/
+  - .vscode/

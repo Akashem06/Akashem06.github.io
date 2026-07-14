@@ -1,0 +1,38 @@
+{%- comment -%}
+  Nav order is fixed (docs/02-tabs.md). Active tab via page.nav.
+  Top bar = brand + "wash tabs" (section links, each carrying its own watercolor
+  --wash that blooms with a wet url(#wash-bloom) edge on hover/active) + theme
+  toggle. On mobile the tabs become a horizontally scrollable strip on a second
+  row (no hamburger). (see docs/03-user-interface)
+{%- endcomment -%}
+{%- assign nav = page.nav -%}
+<header class="site-header">
+  <nav class="nav" aria-label="Primary">
+    <a class="nav__brand" href="{{ '/' | relative_url }}">{{ site.title }}</a>
+
+    <ul class="nav__tabs" id="nav-tabs">
+      <li><a class="nav__tab" style="--wash: var(--teal)" href="{{ '/' | relative_url }}" {% if nav == 'home' %}aria-current="page"{% endif %}>Home</a></li>
+      <li><a class="nav__tab" style="--wash: var(--lav)" href="{{ '/blog/' | relative_url }}" {% if nav == 'blog' %}aria-current="page"{% endif %}>Blog</a></li>
+      <li><a class="nav__tab" style="--wash: var(--sky)" href="{{ '/projects/' | relative_url }}" {% if nav == 'projects' %}aria-current="page"{% endif %}>Projects</a></li>
+      <li><a class="nav__tab" style="--wash: var(--sage)" href="{{ '/experiences/' | relative_url }}" {% if nav == 'experiences' %}aria-current="page"{% endif %}>Experience</a></li>
+      <li><a class="nav__tab" style="--wash: var(--peach)" href="{{ '/photography/' | relative_url }}" {% if nav == 'photography' %}aria-current="page"{% endif %}>Photography</a></li>
+      <li><a class="nav__tab" style="--wash: var(--rose)" href="{{ '/art/' | relative_url }}" {% if nav == 'art' %}aria-current="page"{% endif %}>Art</a></li>
+      <li><a class="nav__tab" style="--wash: var(--gold)" href="{{ '/resources/' | relative_url }}" {% if nav == 'resources' %}aria-current="page"{% endif %}>Resources</a></li>
+    </ul>
+
+    <button
+      class="icon-btn theme-toggle"
+      id="theme-toggle"
+      type="button"
+      aria-label="Switch to dark theme"
+    >
+      <svg class="theme-toggle__moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+      </svg>
+      <svg class="theme-toggle__sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <circle cx="12" cy="12" r="4"></circle>
+        <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"></path>
+      </svg>
+    </button>
+  </nav>
+</header>

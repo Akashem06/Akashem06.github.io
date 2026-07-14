@@ -1,0 +1,2402 @@
+/* =============================================================================
+   main.css - single source of truth for the visual system.
+   All hex/color values live ONLY in the token blocks below (see docs/01-visual).
+   TWO themes off ONE palette: the default warm "paper" light theme, and a warm
+   charcoal "paper at night" dark theme. Dark mode only re-points the token block
+   (under html[data-theme="dark"]), so every component re-skins with no markup
+   change. The toggle lives in the nav; the lightbox stays dark in both.
+   ========================================================================== */
+
+/* ---- Type (2026 watercolor pivot) -----------------------------------------
+   Off the self-hosted Anton/Archivo dystopia. The watercolor direction uses
+   Gloock (high-contrast display serif) + Spectral (reading serif) + Spline Sans
+   Mono (labels/kickers), loaded from Google Fonts in _layouts/default.html so
+   text paints with a serif fallback while they swap in. (see docs/01-visual) */
+
+/* ---- Tokens: watercolor + sketchbook (2026 pivot) -------------------------
+   Off the crimson dystopia. Palette pulled from Aryan's own photography and
+   sketches: warm cold-press paper, graphite ink, a plum accent, and a set of
+   watercolor washes for the hero bloom. Legacy component names (--bg / --accent
+   / --border …) are MAPPED onto this palette below, so every existing page and
+   component re-skins with no markup change. (see docs/01-visual) */
+:root {
+  /* paint */
+  --paper: #f7f2e9; /* warm cold-press paper — the canvas */
+  --paper-elev: #fffdf8; /* cards / nav, faintly lifted off the paper */
+  --ink: #272220; /* graphite text (~13:1 on paper) */
+  --ink-soft: #766b62; /* meta / captions (~4.7:1) */
+  --plum: #6a4d88; /* accent — links, kickers, active tab (~5.6:1 on paper) */
+  --plum-deep: #543c6e; /* deeper plum — button fills under white labels */
+  --line: #e4dac9; /* hairlines / rules on paper */
+  /* watercolor washes — the hero bloom + small accents. "Saturated studio" set
+     (recipe 03): deeper pigments so the bloom actually reads on paper via multiply
+     and stays rich (not neon-pastel) on the charcoal via screen. Shared by both
+     themes; dark just paints them at a lower opacity. (see docs/01-visual) */
+  --lav: #7b57c8; --peach: #e8734e; --sage: #64a95e; --sky: #3aa0c9;
+  --gold: #e0a53a; --rose: #d95d8a; --teal: #2fa79b; --tomato: #e2603f; --lilac: #9a72d8;
+
+  /* legacy tokens → palette (every component reads these, so theming is central) */
+  --bg: var(--paper);
+  --bg-elev: var(--paper-elev);
+  --border: var(--line);
+  --text: var(--ink);
+  --text-dim: var(--ink-soft);
+  --accent: var(--plum);
+  --accent-hover: var(--plum-deep);
+  --accent-text: var(--plum);
+  --on-accent: #ffffff;
+  --pop-bg: rgba(106, 77, 136, 0.08); /* tag / badge fill */
+  --pop-text: var(--plum); /* tag / badge text */
+  --logo-bg: #ffffff; /* company-logo plate — kept white in BOTH themes so dark
+                         logos stay legible on the charcoal canvas */
+  --grain-opacity: 0.06; /* faint paper tooth */
+  --grid-line: transparent; /* the hard ministry grid is gone */
+  --grid-on-red: rgba(106, 77, 136, 0.08); /* faint plum texture inside header bands */
+  --ghost-stroke: rgba(106, 77, 136, 0.18); /* outline of the big ghost numeral */
+  /* Plum "ink" overlays for the per-tab banner textures (hatch/ledger/film/etc). */
+  --band-ink: rgba(106, 77, 136, 0.12);
+  --band-ink-soft: rgba(106, 77, 136, 0.07);
+  --band-ink-2: rgba(106, 77, 136, 0.16);
+  --band-margin: rgba(106, 77, 136, 0.3);
+}
+
+/* ---- Dark theme: "paper at night" -----------------------------------------
+   Warm charcoal canvas, soft off-white ink, a warm coral accent (the light theme's
+   plum reads muddy on charcoal; coral is warm, legible, and ties to the wash palette).
+   We re-point only the PAINT tokens (--paper/--ink/--plum/--line) plus the few
+   tokens that hardcode a plum rgba; the legacy mappings (--bg: var(--paper) …)
+   and --accent/--accent-text (= var(--plum)) all follow automatically, so the
+   whole site re-skins from this one block.
+
+   Activation: the no-flash script in default.html sets data-theme on <html> from
+   the saved choice, else the OS preference — so the CSS only needs the explicit
+   selector here (no prefers-color-scheme duplication). (see docs/01-visual) */
+html[data-theme="dark"] {
+  --paper: #1c1815; /* warm brown-black canvas */
+  --paper-elev: #262019; /* cards / nav, lifted off the canvas */
+  --ink: #f2ece0; /* warm off-white text (~12:1 on canvas) */
+  --ink-soft: #a89c8d; /* meta / captions (~5:1) */
+  --plum: #ef9a7a; /* warm coral accent — candlelit, ~8:1 on the charcoal */
+  --plum-deep: #e5825a; /* deeper coral button fill — dark label sits on it */
+  --line: #3a322a; /* hairlines / rules on charcoal */
+
+  --on-accent: #1c1815; /* dark label on the coral button fill (~7:1) */
+  --grain-opacity: 0.05;
+  --pop-bg: rgba(239, 154, 122, 0.16);
+  --grid-on-red: rgba(239, 154, 122, 0.07);
+  --ghost-stroke: rgba(239, 154, 122, 0.2);
+  --band-ink: rgba(239, 154, 122, 0.14);
+  --band-ink-soft: rgba(239, 154, 122, 0.07);
+  --band-ink-2: rgba(239, 154, 122, 0.18);
+  --band-margin: rgba(239, 154, 122, 0.3);
+  --shadow-soft: 0 14px 36px rgba(0, 0, 0, 0.55);
+}
+/* The hero + project-header blooms paint with `multiply`, which sinks the light
+   washes into a dark canvas. Flip them to `screen` so the paint glows on night. */
+html[data-theme="dark"] .blob,
+html[data-theme="dark"] .article--project .article__header::before {
+  mix-blend-mode: screen;
+}
+/* Theme leaks: a few hero pieces hardcode warm-paper values — a near-white stamp
+   pill, a paper-white glow behind the name, and a near-white field-log card. They
+   must go dark here or they glare on the charcoal. */
+html[data-theme="dark"] .stamp {
+  background: rgba(38, 32, 25, 0.72);
+}
+html[data-theme="dark"] .hero--home h1 {
+  text-shadow: 0 2px 22px rgba(0, 0, 0, 0.5);
+}
+html[data-theme="dark"] .log {
+  background: rgba(40, 34, 27, 0.85);
+  box-shadow: 0 18px 44px rgba(0, 0, 0, 0.5), inset 0 0 0 1px var(--line);
+}
+/* ---- Type / spacing scale -------------------------------------------------- */
+:root {
+  /* Watercolor type: Gloock (high-contrast display serif) for headlines over
+     Spectral (refined reading serif) for body; Spline Sans Mono for the small
+     uppercase kickers/labels. Serif fallbacks hold the layout while they load. */
+  --font-display: "Gloock", Georgia, "Times New Roman", serif;
+  --font-body: "Spectral", Georgia, "Times New Roman", serif;
+  --font-mono: "Spline Sans Mono", ui-monospace, "SF Mono", Menlo, monospace;
+
+  --step-h1: 2.5rem;
+  --step-h2: 1.75rem;
+  --step-h3: 1.25rem;
+  --step-body: 1.0625rem;
+  --step-small: 0.9375rem;
+
+  --space-1: 8px;
+  --space-2: 16px;
+  --space-3: 24px;
+  --space-4: 32px;
+  --space-6: 48px;
+  --space-8: 64px;
+  --space-10: 80px;
+  --space-12: 112px;
+
+  --measure: 720px; /* pages/articles */
+  --radius: 14px; /* soft watercolor corners */
+  --r: 18px; /* bento tiles / cards */
+  --speed: 175ms;
+
+  /* Accent gradient — plum into lavender wash (headline + button moments). */
+  --grad: linear-gradient(120deg, var(--plum), var(--lav));
+  /* Soft plum elevation shadow for hover states (a lifted-paper feel). */
+  --shadow-soft: 0 10px 30px rgba(106, 77, 136, 0.16);
+}
+
+/* ---- Reset / base ---------------------------------------------------------- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: var(--step-body);
+  line-height: 1.6;
+}
+
+/* ---- Grid: hard crimson hairline grid behind everything --------------------
+   The dystopian "ministry blueprint" backdrop — a faint, static crimson
+   cross-hatch (no images, no network). Fixed, z-index -1, pointer-inert; colour
+   via --grid-line. Static, so nothing to gate for reduced motion. */
+.grid {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image: repeating-linear-gradient(
+      to right,
+      var(--grid-line) 0 1px,
+      transparent 1px 80px
+    ),
+    repeating-linear-gradient(
+      to bottom,
+      var(--grid-line) 0 1px,
+      transparent 1px 80px
+    );
+}
+
+/* ---- Grain: faint ink/CRT texture over the grid (tactile depth) ------------
+   Inline SVG fractal noise (no network request), tiled, very low opacity. Sits
+   in the same fixed background layer as .grid (z-index -1) but later in the DOM,
+   so it textures the backdrop without ever touching content or interaction.
+   Static — no animation, so nothing to gate for reduced motion. */
+.grain {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: var(--grain-opacity);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+h1,
+h2,
+h3 {
+  line-height: 1.12;
+  margin: 0 0 var(--space-2);
+  overflow-wrap: break-word;
+  text-wrap: balance;
+}
+
+/* Gloock carries the display moments (h1/h2): a high-contrast serif, set tight,
+   mixed case (no propaganda caps). h3 is the same serif a touch lighter so small
+   subheads still read as headings, not labels. */
+h1,
+h2 {
+  font-family: var(--font-display);
+  font-weight: 400; /* Gloock ships one weight */
+  letter-spacing: -0.01em;
+}
+
+h1 {
+  font-size: var(--step-h1);
+}
+h2 {
+  font-size: var(--step-h2);
+}
+h3 {
+  font-family: var(--font-display);
+  font-size: var(--step-h3);
+  font-weight: 400;
+}
+
+p {
+  margin: 0 0 var(--space-2);
+}
+
+small,
+.small {
+  font-size: var(--step-small);
+}
+
+a {
+  color: var(--accent-text); /* AA-safe crimson for small text on ink */
+  text-decoration: none;
+}
+a:hover {
+  color: var(--accent-text);
+  text-decoration: underline;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+code,
+pre {
+  font-family: var(--font-mono);
+  font-size: 0.9em;
+}
+
+pre {
+  background: var(--bg-elev);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--space-2);
+  overflow-x: auto;
+}
+
+code {
+  background: var(--bg-elev);
+  border-radius: 4px;
+  padding: 0.1em 0.35em;
+}
+
+pre code {
+  background: none;
+  padding: 0;
+}
+
+hr {
+  border: 0;
+  border-top: 1px solid var(--border);
+  margin: var(--space-4) 0;
+}
+
+/* Visible focus ring everywhere (accessibility). */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* ---- Layout helpers -------------------------------------------------------- */
+.container {
+  max-width: var(--measure);
+  margin-inline: auto;
+  padding-inline: var(--space-2);
+}
+
+.container-wide {
+  max-width: 1200px;
+  margin-inline: auto;
+  padding-inline: var(--space-2);
+}
+
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  background: var(--accent);
+  color: var(--bg);
+  padding: var(--space-1) var(--space-2);
+  z-index: 100;
+}
+.skip-link:focus {
+  left: var(--space-1);
+  top: var(--space-1);
+}
+
+main {
+  display: block;
+  min-height: 60vh;
+  padding-block: clamp(var(--space-6), 7vw, var(--space-12));
+}
+
+.section {
+  margin-bottom: clamp(var(--space-8), 8vw, var(--space-12));
+}
+.section:last-child {
+  margin-bottom: 0;
+}
+
+.section-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-1) var(--space-2);
+  margin-bottom: var(--space-3);
+  border-top: 1px solid var(--border);
+  padding-top: var(--space-2);
+}
+/* Propaganda index numerals: auto-number each .section (01 — / 02 — …) via a
+   CSS counter, so headings get a stamped serial without any markup. The hero is
+   not a .section, so numbering starts at the first real content block. */
+main {
+  counter-reset: section;
+}
+.section {
+  counter-increment: section;
+}
+.section-head h2::before {
+  content: counter(section, decimal-leading-zero) ".\00a0";
+  color: var(--accent);
+}
+
+/* ---- Projects: editorial index ---------------------------------------------
+   Each project is a roomy row: number, 4:3 cover, a short title (split from its
+   colon subtitle in projects.html) + subtitle + stack, and the year. Each row is
+   a plain link that navigates to the project's own page. (see docs/02-tabs,
+   docs/03-user-interface) */
+/* ---- Projects & Blog: 2-up cards ------------------------------------------
+   The old editorial rows are retired for a responsive TWO-column card grid
+   (rounded card: cover on top, then title / subtitle / meta), collapsing to one
+   column on narrow screens (`.g2`). Projects and posts share `.pcard`, so the two
+   lists still read as siblings. Hover is ONE clean move: the card lifts and a soft
+   watercolor wash blooms up from its base (per-card --pcw, wet #bleed edge) — the
+   site's signature, nothing else competing. (see docs/03-user-interface) */
+.pcards {
+  display: grid;
+  gap: var(--space-3);
+  margin-block: var(--space-4) var(--space-10);
+}
+.pcard {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  text-decoration: none;
+  color: inherit;
+  background: var(--bg-elev);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  overflow: hidden;
+  isolation: isolate;
+  transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+}
+.pcard:hover,
+.pcard:focus-visible {
+  transform: translateY(-5px);
+  box-shadow: 0 18px 40px rgba(60, 45, 35, 0.16);
+  border-color: color-mix(in srgb, var(--pcw, var(--accent)) 45%, var(--border));
+}
+.pcard:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+/* the whimsy: a watercolor wash blooms up from the card's base on hover */
+.pcard::after {
+  content: "";
+  position: absolute;
+  left: -10%;
+  right: -10%;
+  bottom: -32%;
+  height: 72%;
+  z-index: -1;
+  pointer-events: none;
+  border-radius: 50%;
+  background: radial-gradient(60% 100% at 50% 100%, color-mix(in srgb, var(--pcw, var(--accent)) 70%, transparent), transparent 72%);
+  filter: url(#bleed) blur(6px);
+  opacity: 0;
+  transform: translateY(14px) scale(0.9);
+  mix-blend-mode: multiply;
+  transition: opacity 0.3s ease, transform 0.35s ease;
+}
+html[data-theme="dark"] .pcard::after { mix-blend-mode: screen; }
+.pcard:hover::after,
+.pcard:focus-visible::after {
+  opacity: 0.5;
+  transform: translateY(0) scale(1);
+}
+.pcard__cover {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+}
+.pcard__cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.35s ease;
+}
+.pcard:hover .pcard__cover img,
+.pcard:focus-visible .pcard__cover img {
+  transform: scale(1.04);
+}
+.pcard__body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  padding: var(--space-3);
+}
+.pcard__chip {
+  align-self: flex-start;
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent-text);
+  border: 1px solid var(--accent);
+  border-radius: 999px;
+  padding: 2px 9px;
+  margin-bottom: 0.35rem;
+}
+.pcard__title {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 1.6rem;
+  line-height: 1.06;
+  letter-spacing: -0.01em;
+  color: var(--text);
+  margin: 0;
+  overflow-wrap: break-word;
+  text-wrap: balance;
+}
+.pcard__sub {
+  color: var(--text-dim);
+  line-height: 1.5;
+  margin: 0.15rem 0 0;
+  overflow-wrap: break-word;
+}
+.pcard__stack {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin: 0.4rem 0 0;
+}
+.pcard__year {
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  color: var(--accent-text);
+  margin-top: 0.5rem;
+}
+/* per-card wash hue, cycled to match the ph-- placeholder order */
+.pcard:nth-child(8n + 1) { --pcw: var(--gold); }
+.pcard:nth-child(8n + 2) { --pcw: var(--sky); }
+.pcard:nth-child(8n + 3) { --pcw: var(--sage); }
+.pcard:nth-child(8n + 4) { --pcw: var(--tomato); }
+.pcard:nth-child(8n + 5) { --pcw: var(--lav); }
+.pcard:nth-child(8n + 6) { --pcw: var(--peach); }
+.pcard:nth-child(8n + 7) { --pcw: var(--teal); }
+.pcard:nth-child(8n + 8) { --pcw: var(--plum); }
+/* two columns when the screen permits, one when it doesn't. Rows stretch so both
+   cards match the taller one (extra space just sits empty at the card's base). */
+.g2 { grid-template-columns: repeat(2, 1fr); align-items: stretch; }
+@media (max-width: 880px) { .g2 { grid-template-columns: 1fr; } }
+/* Per-row watercolor wash, cycled by index, used when no cover image exists yet. */
+.ph--1 { background: linear-gradient(135deg, var(--gold), var(--peach)); }
+.ph--2 { background: linear-gradient(135deg, var(--sky), var(--teal)); }
+.ph--3 { background: linear-gradient(135deg, var(--sage), var(--gold)); }
+.ph--4 { background: linear-gradient(135deg, var(--tomato), var(--rose)); }
+.ph--5 { background: linear-gradient(135deg, var(--lav), var(--sky)); }
+.ph--6 { background: linear-gradient(135deg, var(--peach), var(--rose)); }
+.ph--7 { background: linear-gradient(135deg, var(--teal), var(--sage)); }
+.ph--8 { background: linear-gradient(135deg, var(--plum), var(--lav)); }
+/* (the .track editorial-row styles were retired — projects & blog now use the
+   .pcard 2-up card grid above. The .ph--N wash placeholders are still used by the
+   cards' coverless state.) */
+
+/* ---- Project page header — soft watercolor bloom ---------------------------
+   Each project navigates to its own page (no JS panel). The header echoes the
+   home hero: a faint, blurred paint bloom sitting behind the title, serif
+   display type, airy spacing. (see docs/01-visual, docs/03-user-interface) */
+.article--project .article__header {
+  position: relative;
+  margin-bottom: var(--space-4);
+  padding-top: var(--space-2);
+}
+/* The homepage `.section` rhythm (64–112px) is far too airy inside the narrow
+   article column. Tighten the gaps between media / Highlights / Challenges / body
+   so a project reads as one document, not stacked full-width bands. */
+.article--project .section {
+  margin-bottom: clamp(var(--space-4), 5vw, var(--space-6));
+}
+.article--project .section h2 {
+  margin-bottom: var(--space-2);
+}
+.article--project .article__header::before {
+  content: "";
+  position: absolute;
+  left: -6%;
+  top: -55%;
+  width: 62%;
+  height: 230%;
+  z-index: -1;
+  pointer-events: none;
+  filter: blur(36px);
+  opacity: 0.5;
+  mix-blend-mode: multiply;
+  background: radial-gradient(38% 48% at 24% 42%, var(--lav), transparent 70%),
+    radial-gradient(34% 44% at 54% 28%, var(--peach), transparent 70%),
+    radial-gradient(32% 42% at 72% 58%, var(--sky), transparent 70%),
+    radial-gradient(26% 38% at 40% 74%, var(--sage), transparent 70%);
+}
+@media (prefers-reduced-motion: reduce) {
+  .article--project .article__header::before {
+    filter: blur(28px);
+  }
+}
+.article__back {
+  display: inline-block;
+  margin-bottom: var(--space-2);
+  font-family: var(--font-mono);
+  font-size: var(--step-small);
+  letter-spacing: 0.04em;
+  color: var(--text-dim);
+  text-decoration: none;
+}
+.article__back:hover {
+  color: var(--accent-text);
+}
+.article--project .article__header h1 {
+  position: relative;
+  margin: 0;
+  overflow-wrap: break-word;
+  text-wrap: balance;
+}
+.article__summary {
+  position: relative;
+  max-width: 60ch;
+  margin-top: var(--space-2);
+  color: var(--text-dim);
+  font-size: var(--step-body);
+  line-height: 1.5;
+}
+
+/* ---- Experience: personnel files ------------------------------------------
+   Each role is a dossier card: crimson top edge, record tag, role title, a mono
+   metadata grid, highlight bullets, optional write-up. (see docs/02-tabs) */
+.files {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--space-3);
+}
+.file {
+  position: relative;
+  background: var(--bg-elev);
+  border: 1px solid var(--border);
+  border-top: 3px solid var(--accent);
+  border-radius: var(--r);
+  padding: var(--space-3);
+}
+.file__tag {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent-text);
+  padding-right: 150px; /* reserve room for the top-right logo */
+}
+.file__logo {
+  position: absolute;
+  top: var(--space-3);
+  right: var(--space-3);
+  height: 56px;
+  width: auto;
+  max-width: 132px;
+  object-fit: contain;
+  object-position: right center;
+  background: var(--logo-bg);
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+.file__role {
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  font-size: 1.5rem;
+  color: var(--text);
+  margin: 0.3rem 0 0.8rem;
+  line-height: 1.1;
+  overflow-wrap: break-word;
+  padding-right: 150px; /* keep long titles clear of the logo */
+}
+.file__meta {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 14px;
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  color: var(--text-dim);
+  border-block: 1px solid var(--border);
+  padding-block: 12px;
+  margin-bottom: 0.8rem;
+}
+.file__meta b {
+  display: block;
+  color: var(--accent-text);
+  opacity: 0.8;
+  font-weight: 400;
+  font-size: 0.64rem;
+  letter-spacing: 0.1em;
+}
+.file__highlights {
+  margin: 0;
+  padding-left: 1.1rem;
+}
+.file__note {
+  margin-top: 0.8rem;
+  color: var(--text-dim);
+}
+.file .tags {
+  margin-top: 0.8rem;
+}
+/* Optional photo strip from the role (studio "gallery" field). Small, square-ish
+   thumbs that open in the shared lightbox; sits above the corner bloom (z-index). */
+.file__shots {
+  position: relative;
+  z-index: 1;
+  margin-top: 1rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+  gap: var(--space-1);
+}
+.file__shots .thumb {
+  aspect-ratio: 1 / 1;
+}
+.file__shots .thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+/* On narrow cards the logo can't share the top row with the title, so let it
+   flow inline above the tag and drop the reserved padding. */
+@media (max-width: 560px) {
+  .file__logo {
+    position: static;
+    display: block;
+    margin-bottom: var(--space-2);
+    height: 48px;
+    max-width: 60%;
+    object-position: left center;
+  }
+  .file__tag,
+  .file__role {
+    padding-right: 0;
+  }
+}
+
+.muted {
+  color: var(--text-dim);
+}
+
+/* ---- Page header (eyebrow + title + lede) ---------------------------------
+   The standard top-of-page block. Gives the intro real breathing room before
+   the content below (fixes the cramped "summary jammed on content" pages). */
+.page-header {
+  margin-bottom: clamp(var(--space-6), 6vw, var(--space-10));
+}
+.page-header h1 {
+  font-size: clamp(2rem, 5vw, 3rem);
+  letter-spacing: -0.02em;
+  margin-bottom: 0;
+}
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6em;
+  margin-bottom: var(--space-2);
+  color: var(--plum);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+/* Small painted bar before the kicker. */
+.eyebrow::before {
+  content: "";
+  width: 1.4em;
+  height: 0.5em;
+  border-radius: 2px;
+  background: var(--plum);
+}
+.page-lede {
+  margin-top: var(--space-3);
+  max-width: 60ch;
+  color: var(--text-dim);
+  font-size: clamp(1.0625rem, 2vw, 1.25rem);
+  line-height: 1.5;
+}
+
+/* ---- Page masthead — bloom + title (replaces the old crimson banners) -------
+   Echoes the home page: a small, static multi-colour watercolor bloom (wet
+   url(#bleed) edges, breathing slowly) behind a big display title, with an
+   optional mono eyebrow, a thin rule, and a lede. See _includes/masthead.html. */
+.masthead {
+  position: relative;
+  overflow: hidden; /* clips the bloom to the header band */
+  /* Compact/dense: sit the title close under the nav, not in a tall band. */
+  padding-block: clamp(var(--space-2), 3vw, var(--space-4)) var(--space-2);
+  margin-bottom: clamp(var(--space-3), 3.5vw, var(--space-5, 40px));
+}
+.masthead__inner {
+  position: relative;
+}
+.masthead__bloom {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  mix-blend-mode: multiply;
+}
+html[data-theme="dark"] .masthead__bloom {
+  mix-blend-mode: screen;
+}
+.mblob {
+  position: absolute;
+  left: var(--l);
+  top: var(--t);
+  width: var(--s);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(circle at 50% 50%, color-mix(in srgb, var(--wash) 92%, transparent), transparent 62%);
+  filter: url(#bleed) blur(5px);
+  opacity: var(--o, 0.5);
+  will-change: transform;
+  animation: mbloom var(--dur, 18s) ease-in-out var(--delay, 0s) infinite;
+}
+/* Recipe 03 dials the wash back on the charcoal so night reads as tinted paint,
+   not a bright bleed. (Inline --o only sets a custom prop, so this cleanly wins.) */
+html[data-theme="dark"] .mblob { opacity: 0.4; }
+@keyframes mbloom {
+  0%, 100% { transform: translate(-50%, -50%) scale(1) rotate(0deg); }
+  33%      { transform: translate(-47%, -54%) scale(1.08) rotate(5deg); }
+  66%      { transform: translate(-54%, -48%) scale(0.94) rotate(-4deg); }
+}
+.masthead__eyebrow {
+  position: relative;
+  z-index: 1;
+  margin: 0 0 0.6rem;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+.masthead__title {
+  position: relative;
+  z-index: 1;
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 400;
+  line-height: 0.92;
+  letter-spacing: -0.02em;
+  color: var(--text);
+  font-size: clamp(2.8rem, 8vw, 5.5rem);
+}
+.masthead__rule {
+  position: relative;
+  z-index: 1;
+  border: none;
+  height: 1px;
+  background: var(--border);
+  margin: 1.3rem 0 0;
+}
+.masthead__lede {
+  position: relative;
+  z-index: 1;
+  margin: 1.1rem 0 0;
+  max-width: 56ch;
+  color: var(--text-dim);
+  font-size: clamp(1.0625rem, 2vw, 1.2rem);
+  line-height: 1.55;
+}
+@media (prefers-reduced-motion: reduce) {
+  .mblob { animation: none; }
+}
+
+/* ---- Section-title bloom (concept 03) --------------------------------------
+   A soft multi-wash watercolor bloom seeps in behind a standalone section title
+   as it enters view — the masthead/home language, scaled down for in-page
+   headings (project Highlights/Challenges, post Related, …). Rides the reveal
+   system: the wash starts hidden only when reveal.js is active (html.reveal) and
+   fades in on .is-visible; otherwise (no-JS / reduced-motion) it's shown at once.
+   See _includes/bloom-head.html. */
+.bloom-head {
+  position: relative;
+  display: block;
+  width: fit-content;
+  max-width: 100%;
+  padding: 0.3rem 0.9rem;
+  margin-left: -0.9rem; /* let the wash bleed left without shifting the text */
+}
+.bloom-head__title {
+  position: relative;
+  z-index: 1;
+  margin: 0;
+}
+.bloom-head__wash {
+  position: absolute;
+  inset: -45% -25%;
+  z-index: 0;
+  pointer-events: none;
+  mix-blend-mode: multiply;
+  opacity: 1;
+  transition: opacity 1s ease;
+}
+html[data-theme="dark"] .bloom-head__wash {
+  mix-blend-mode: screen;
+}
+/* Only hide (then seep in) when the reveal system is actually running. */
+.reveal .bloom-head[data-reveal] .bloom-head__wash {
+  opacity: 0;
+}
+.reveal .bloom-head[data-reveal].is-visible .bloom-head__wash {
+  opacity: 1;
+}
+.bloom-head__wash i {
+  position: absolute;
+  left: var(--l);
+  top: var(--t);
+  width: 150px;
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: radial-gradient(circle, color-mix(in srgb, var(--wash) 92%, transparent), transparent 62%);
+  filter: url(#bleed) blur(4px);
+  opacity: 0.55;
+  animation: mbloom 18s ease-in-out infinite;
+}
+html[data-theme="dark"] .bloom-head__wash i { opacity: 0.4; }
+.bloom-head__wash i:nth-child(2) { animation-delay: -6s; }
+.bloom-head__wash i:nth-child(3) { animation-delay: -11s; }
+@media (prefers-reduced-motion: reduce) {
+  .bloom-head__wash i { animation: none; }
+}
+
+/* ---- Header / nav ---------------------------------------------------------- */
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: var(--bg-elev); /* solid fallback (no backdrop-filter support) */
+  border-bottom: 1px solid var(--border);
+  transition: box-shadow var(--speed) ease-out, background-color var(--speed) ease-out;
+}
+/* Frosted glass: let content blur through the bar where supported. */
+@supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .site-header {
+    background: color-mix(in srgb, var(--bg-elev) 80%, transparent);
+    -webkit-backdrop-filter: saturate(1.5) blur(12px);
+    backdrop-filter: saturate(1.5) blur(12px);
+  }
+}
+/* Subtle lift once the page is scrolled (class toggled in theme.js). */
+.site-header.is-scrolled {
+  box-shadow: 0 1px 0 var(--border), 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  max-width: 1200px;
+  margin-inline: auto;
+  padding: var(--space-1) var(--space-2);
+}
+
+.nav__brand {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 1.35rem;
+  letter-spacing: 0;
+  color: var(--text);
+  margin-right: var(--space-3); /* tabs sit next; their auto-margin pushes the toggle right */
+  white-space: nowrap;
+}
+.nav__brand:hover {
+  text-decoration: none;
+  color: var(--accent);
+}
+
+/* ---- Wash tabs (top-bar section nav) --------------------------------------
+   Section links live in the top bar. Each carries its own watercolor --wash
+   (set inline per link); on hover / focus / active a wash-tinted dab blooms
+   behind the label with a wet url(#wash-bloom) edge — painted, not a glow.
+   Brand sits left, tabs next, theme toggle far right; on mobile the tabs drop
+   to a scrollable second row. (see docs/03-user-interface) */
+.nav__tabs {
+  display: flex;
+  align-items: center;
+  gap: 0.1rem;
+  margin: 0 0 0 auto; /* push the tabs (and toggle) to the far right of the bar */
+  padding: 0;
+  list-style: none;
+}
+.nav__tab {
+  position: relative;
+  z-index: 0;
+  display: inline-flex;
+  align-items: center;
+  padding: 0.5rem 0.7rem;
+  border-radius: 8px;
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-size: 0.75rem;
+  color: var(--text-dim);
+  transition: color 0.18s ease-out;
+}
+/* the per-section watercolor bloom */
+.nav__tab::before {
+  content: "";
+  position: absolute;
+  inset: 5px 2px;
+  z-index: -1;
+  border-radius: 8px;
+  background: var(--wash, var(--accent));
+  opacity: 0;
+  transform: scale(0.72);
+  filter: url(#wash-bloom);
+  transition: opacity 0.22s ease-out, transform 0.22s cubic-bezier(0.2, 1.2, 0.4, 1);
+}
+.nav__tab:hover,
+.nav__tab[aria-current="page"] {
+  color: var(--text);
+  text-decoration: none;
+}
+.nav__tab:hover::before,
+.nav__tab:focus-visible::before,
+.nav__tab[aria-current="page"]::before {
+  opacity: 0.5;
+  transform: scale(1);
+}
+.nav__tab:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  color: var(--text);
+}
+/* washes are pastel constants in both themes; ease them back on charcoal so the
+   off-white label stays legible over the active/hover dab. */
+html[data-theme="dark"] .nav__tab:hover::before,
+html[data-theme="dark"] .nav__tab:focus-visible::before,
+html[data-theme="dark"] .nav__tab[aria-current="page"]::before {
+  opacity: 0.4;
+}
+
+/* Hamburger button */
+.icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  background: none;
+  border: 1px solid transparent;
+  border-radius: var(--radius);
+  color: var(--text);
+  cursor: pointer;
+}
+.icon-btn:hover {
+  border-color: var(--border);
+  color: var(--accent);
+}
+
+/* Theme toggle: always visible (desktop + mobile). Shows the moon in light mode
+   (click → dark) and the sun in dark mode (click → light); the no-flash script
+   sets data-theme before paint, so the right icon is there from the first frame. */
+.theme-toggle .theme-toggle__sun,
+.theme-toggle .theme-toggle__moon {
+  display: none;
+}
+html[data-theme="light"] .theme-toggle .theme-toggle__moon,
+html[data-theme="dark"] .theme-toggle .theme-toggle__sun {
+  display: block;
+}
+
+/* ---- Cards ----------------------------------------------------------------- */
+.card {
+  display: block;
+  background: var(--bg-elev);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--space-3);
+  color: inherit;
+  transition: transform var(--speed) ease-out, border-color var(--speed) ease-out,
+    box-shadow var(--speed) ease-out;
+}
+a.card:hover {
+  text-decoration: none;
+  transform: translateY(-3px);
+  border-color: var(--accent);
+  box-shadow: var(--shadow-soft);
+}
+
+.card__meta {
+  color: var(--text-dim);
+  font-size: var(--step-small);
+  margin-bottom: var(--space-1);
+}
+
+.card__title {
+  margin: 0 0 var(--space-1);
+  font-size: var(--step-h3);
+}
+
+.card-grid {
+  display: grid;
+  gap: var(--space-3);
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+}
+
+/* Photo card: fixed 3/2 media so every gallery tile is the same shape regardless
+   of the source photo's aspect ratio (the home "From the gallery" card pattern). */
+.card--photo {
+  padding: 0;
+  overflow: hidden;
+}
+.card__media {
+  display: block;
+  aspect-ratio: 3 / 2;
+  background: var(--bg);
+  overflow: hidden;
+}
+.card__media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform var(--speed) ease-out;
+}
+.card--photo:hover .card__media img {
+  transform: scale(1.04);
+}
+/* Direct-child title (home "From the gallery" tiles): pad the caption itself. */
+.card--photo > .card__title {
+  padding: var(--space-2);
+  margin: 0;
+}
+/* Project cards wrap title + summary + tags in a padded block under the cover. */
+.card--photo .card__pad {
+  padding: var(--space-3);
+}
+.card--photo .card__pad .card__title {
+  margin: 0 0 var(--space-1);
+}
+
+/* Badges / tags */
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+  list-style: none;
+  margin: var(--space-1) 0 0;
+  padding: 0;
+}
+
+.tag {
+  display: inline-block;
+  background: var(--pop-bg);
+  color: var(--pop-text);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 5px 11px;
+  border-radius: 16px;
+}
+
+.btn {
+  display: inline-block;
+  background: var(--plum-deep); /* deeper plum — white label clears AA */
+  color: var(--on-accent);
+  padding: 13px 24px;
+  border: 1.5px solid var(--plum-deep);
+  border-radius: 30px;
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-size: 0.8rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  transition: transform var(--speed) ease-out, box-shadow var(--speed) ease-out,
+    background-color var(--speed) ease-out, color var(--speed) ease-out,
+    border-color var(--speed) ease-out;
+}
+.btn:hover {
+  text-decoration: none;
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-soft);
+  background: var(--ink);
+  border-color: var(--ink);
+}
+.btn--ghost {
+  background: none;
+  color: var(--plum);
+  border: 1.5px solid var(--plum);
+}
+.btn--ghost:hover {
+  background: var(--plum);
+  border-color: var(--plum);
+  color: var(--on-accent);
+}
+
+/* Group of adjacent buttons/links — keeps a consistent gap so they never touch
+   (inline .btn elements otherwise butt up against each other). */
+.btn-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+/* ---- Article (post / page) ------------------------------------------------- */
+.article {
+  max-width: var(--measure);
+  margin-inline: auto;
+}
+.article__header {
+  margin-bottom: var(--space-4);
+}
+.article__meta {
+  color: var(--text-dim);
+  font-size: var(--step-small);
+  margin-bottom: var(--space-1);
+}
+.article__body {
+  max-width: 70ch;
+}
+.article__body img {
+  border-radius: var(--radius);
+  margin-block: var(--space-3);
+}
+.article__body h2 {
+  margin-top: var(--space-4);
+}
+
+/* ---- Card watercolor accents: corner bloom (rest) + wash (hover) -----------
+   Brings the home page's watercolor language to the inner-page cards so they
+   stop reading as plain boxes. ONE device — a soft corner bloom at rest that
+   opens into a fuller, #bleed-wet wash on hover — but TUNED PER PAGE (corner,
+   hue set, intensity) so resources / projects / experience each feel distinct
+   while sharing the DNA, the way each tab already has its own banner. (Blog now
+   uses the projects `.track` index instead of cards, so it's not in this set.)
+   The resting bloom uses a cheap blur(); the hover wash uses url(#bleed)
+   (defined once in default.html) for the ragged wet edge. Each card carries one
+   hue in --bw, used quiet in the corner and fuller on hover. multiply on paper →
+   screen on night, the same flip the hero blooms use. All pseudo-elements are
+   pointer-inert and sit under the content (lifted to z-index 1). Photo cards are
+   excluded — a wash over a photo just muddies it. (see docs/01-visual) */
+
+/* Resources (card-grid): warm hues, bloom from the BOTTOM-LEFT (a different corner). */
+.card-grid .card:not(.card--photo) {
+  --bw: var(--gold);
+  position: relative;
+  overflow: hidden;
+}
+.card-grid .card:not(.card--photo) > * { position: relative; z-index: 1; }
+.card-grid .card:not(.card--photo)::before {
+  content: ""; position: absolute; left: -32px; bottom: -32px;
+  width: 120px; height: 120px; border-radius: 50%; z-index: 0;
+  background: radial-gradient(circle, var(--bw), transparent 70%);
+  filter: blur(10px); opacity: 0.3; mix-blend-mode: multiply;
+  transition: opacity 0.3s ease, transform 0.3s ease; pointer-events: none;
+}
+.card-grid .card:not(.card--photo)::after {
+  content: ""; position: absolute; inset: 0; z-index: 0;
+  background: radial-gradient(120% 130% at 0% 100%, var(--bw), transparent 60%);
+  filter: url(#bleed) blur(6px); opacity: 0; mix-blend-mode: multiply;
+  transition: opacity 0.35s ease; pointer-events: none;
+}
+.card-grid .card:not(.card--photo):hover::before { opacity: 0.5; transform: scale(1.12); }
+.card-grid .card:not(.card--photo):hover::after { opacity: 0.42; }
+.card-grid .card:nth-child(4n + 1) { --bw: var(--gold); }
+.card-grid .card:nth-child(4n + 2) { --bw: var(--peach); }
+.card-grid .card:nth-child(4n + 3) { --bw: var(--tomato); }
+.card-grid .card:nth-child(4n + 4) { --bw: var(--rose); }
+
+/* Projects (tracklist rows): no resting bloom — the rows are busy — but a wet
+   wash sweeps in from the cover side on hover, hue cycled per row. */
+.track { --bw: var(--teal); position: relative; }
+.track__no, .track__cover, .track__main, .track__meta { position: relative; z-index: 1; }
+.track::after {
+  content: ""; position: absolute; inset: 0; z-index: 0;
+  background: linear-gradient(90deg, var(--bw), transparent 42%);
+  filter: url(#bleed); opacity: 0; mix-blend-mode: multiply;
+  transition: opacity 0.35s ease; pointer-events: none;
+}
+.track:hover::after,
+.track:focus-visible::after { opacity: 0.18; }
+.tracks .track:nth-child(6n + 1) { --bw: var(--teal); }
+.tracks .track:nth-child(6n + 2) { --bw: var(--gold); }
+.tracks .track:nth-child(6n + 3) { --bw: var(--sky); }
+.tracks .track:nth-child(6n + 4) { --bw: var(--rose); }
+.tracks .track:nth-child(6n + 5) { --bw: var(--sage); }
+.tracks .track:nth-child(6n + 6) { --bw: var(--lav); }
+
+/* Experience (dossier files): warm hues, bloom from the BOTTOM-RIGHT — clear of
+   the record tag and the top-right logo. */
+.file { --bw: var(--gold); overflow: hidden; }
+.file__tag, .file__role, .file__meta, .file__highlights,
+.file__note, .file .tags { position: relative; z-index: 1; }
+.file__logo { z-index: 1; }
+.file::before {
+  content: ""; position: absolute; right: -36px; bottom: -36px;
+  width: 150px; height: 150px; border-radius: 50%; z-index: 0;
+  background: radial-gradient(circle, var(--bw), transparent 70%);
+  filter: blur(12px); opacity: 0.26; mix-blend-mode: multiply;
+  transition: opacity 0.3s ease, transform 0.3s ease; pointer-events: none;
+}
+.file::after {
+  content: ""; position: absolute; inset: 0; z-index: 0;
+  background: radial-gradient(120% 130% at 100% 100%, var(--bw), transparent 62%);
+  filter: url(#bleed) blur(7px); opacity: 0; mix-blend-mode: multiply;
+  transition: opacity 0.35s ease; pointer-events: none;
+}
+.file:hover::before { opacity: 0.44; transform: scale(1.1); }
+.file:hover::after { opacity: 0.36; }
+.files .file:nth-child(4n + 1) { --bw: var(--gold); }
+.files .file:nth-child(4n + 2) { --bw: var(--peach); }
+.files .file:nth-child(4n + 3) { --bw: var(--teal); }
+.files .file:nth-child(4n + 4) { --bw: var(--rose); }
+
+/* On night the washes glow on the charcoal instead of sinking into it. */
+html[data-theme="dark"] .card-grid .card::before,
+html[data-theme="dark"] .card-grid .card::after,
+html[data-theme="dark"] .track::after,
+html[data-theme="dark"] .file::before,
+html[data-theme="dark"] .file::after { mix-blend-mode: screen; }
+
+/* ===========================================================================
+   HOME — watercolor bloom hero (direction 12/13)
+   A two-column hero: name + lede over a concentrated, living watercolor splash
+   on the left, the "field log" card on the right. Below: a borderless bento
+   gallery, watercolor project cards, and a writing strip. (see docs/01-visual)
+   ========================================================================== */
+.hero--home {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 44px;
+  align-items: center;
+  padding-block: clamp(var(--space-4), 6vw, var(--space-8));
+}
+.hero__left {
+  position: relative;
+}
+
+/* concentrated paint splash, sitting only behind the name block */
+.splash {
+  position: absolute;
+  left: -30px;
+  top: -40px;
+  width: 480px;
+  height: 320px;
+  max-width: 120%;
+  z-index: 0;
+  pointer-events: none;
+}
+.blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: url(#bleed) blur(7px);
+  mix-blend-mode: multiply;
+  transform-origin: center;
+  will-change: transform;
+  animation-iteration-count: infinite;
+  animation-timing-function: ease-in-out;
+}
+/* ★ Living bloom: each blob drifts in a different direction and breathes. */
+.blob:nth-child(1) { animation-name: driftA; animation-duration: 9s; }
+.blob:nth-child(2) { animation-name: driftB; animation-duration: 11s; animation-delay: -2s; }
+.blob:nth-child(3) { animation-name: driftC; animation-duration: 8s; animation-delay: -4s; }
+.blob:nth-child(4) { animation-name: driftB; animation-duration: 12s; animation-delay: -1s; }
+.blob:nth-child(5) { animation-name: driftA; animation-duration: 10s; animation-delay: -3s; }
+.blob:nth-child(6) { animation-name: driftC; animation-duration: 13s; animation-delay: -5s; }
+.blob:nth-child(7) { animation-name: driftB; animation-duration: 9s; animation-delay: -2s; }
+.blob:nth-child(8) { animation-name: driftA; animation-duration: 11s; animation-delay: -6s; }
+.blob:nth-child(9) { animation-name: driftC; animation-duration: 10s; animation-delay: -3s; }
+@keyframes driftA { 0% { transform: translate(0, 0) scale(1); } 50% { transform: translate(26px, -20px) scale(1.12); } 100% { transform: translate(0, 0) scale(1); } }
+@keyframes driftB { 0% { transform: translate(0, 0) scale(1.06); } 50% { transform: translate(-24px, 18px) scale(0.9); } 100% { transform: translate(0, 0) scale(1.06); } }
+@keyframes driftC { 0% { transform: translate(0, 0) rotate(0); } 50% { transform: translate(16px, 22px) scale(1.1) rotate(8deg); } 100% { transform: translate(0, 0) rotate(0); } }
+
+.stamp {
+  position: relative;
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--plum);
+  background: rgba(247, 242, 233, 0.7);
+  box-shadow: inset 0 0 0 1.5px var(--plum);
+  padding: 6px 12px;
+  transform: rotate(-2deg);
+  margin-bottom: 22px;
+  -webkit-backdrop-filter: blur(2px);
+  backdrop-filter: blur(2px);
+}
+.hero--home h1 {
+  position: relative;
+  font-size: clamp(46px, 7vw, 84px);
+  line-height: 0.92;
+  margin-bottom: 14px;
+  color: var(--ink);
+  text-shadow: 0 2px 16px rgba(247, 242, 233, 0.7);
+}
+.roles {
+  position: relative;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  margin-bottom: 18px;
+}
+.roles b {
+  color: var(--plum);
+  font-weight: 600;
+}
+.lead {
+  position: relative;
+  max-width: 46ch;
+  color: var(--ink);
+  font-size: 1.0625rem;
+  margin-bottom: 24px;
+}
+.hero--home .btn-row {
+  position: relative;
+}
+
+/* field log — the card he loves */
+.log {
+  position: relative;
+  background: rgba(255, 253, 248, 0.92);
+  -webkit-backdrop-filter: blur(3px);
+  backdrop-filter: blur(3px);
+  border-radius: var(--r);
+  padding: 8px 26px 14px;
+  box-shadow: 0 18px 44px rgba(106, 77, 136, 0.16);
+}
+.log-head {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--plum);
+  padding: 18px 0 10px;
+  border-bottom: 1px solid var(--line);
+}
+.entry {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 14px;
+  padding: 18px 0;
+  border-bottom: 1px solid var(--line);
+}
+.entry:last-child {
+  border-bottom: 0;
+}
+.ed {
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  margin-top: 6px;
+}
+.ed.live {
+  background: #5fae6a;
+  box-shadow: 0 0 0 4px rgba(95, 174, 106, 0.22);
+  animation: pulse 2s infinite;
+}
+@keyframes pulse {
+  50% { box-shadow: 0 0 0 8px rgba(95, 174, 106, 0); }
+}
+.ed.b { background: var(--peach); }
+.ed.c { background: var(--sky); }
+.ekind {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  margin-bottom: 3px;
+}
+.entry h3 {
+  font-size: 21px;
+  line-height: 1.04;
+  margin: 0 0 4px;
+}
+.entry p {
+  font-size: 14px;
+  color: var(--ink-soft);
+  margin: 0;
+}
+.entry .thumb {
+  margin-top: 8px;
+  width: 100%;
+  height: 84px;
+  object-fit: cover;
+  border-radius: 10px;
+  display: block;
+  cursor: default;
+}
+
+/* section heads (home — no auto-numbering, unlike inner-page .section-head) */
+.sec-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-2);
+  margin-bottom: 28px;
+}
+.sec-head h2 {
+  font-size: clamp(28px, 4vw, 40px);
+  margin: 0;
+}
+.sec-head a {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--plum);
+  white-space: nowrap;
+}
+
+/* modern borderless bento gallery */
+.bento {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  grid-auto-rows: 200px;
+  gap: 14px;
+}
+.cell {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--r);
+  background: #e9e0cf;
+  box-shadow: 0 8px 22px rgba(39, 34, 32, 0.08);
+  transition: box-shadow 0.3s, transform 0.3s;
+}
+.cell img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.7s cubic-bezier(0.2, 0.7, 0.2, 1);
+  filter: saturate(0.97);
+}
+.cell::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 45%, rgba(30, 24, 30, 0.55));
+  opacity: 0.55;
+  transition: opacity 0.3s;
+}
+.cell .cap {
+  position: absolute;
+  left: 16px;
+  bottom: 14px;
+  z-index: 2;
+  color: #fff;
+  transform: translateY(6px);
+  opacity: 0.9;
+  transition: 0.3s;
+}
+.cell .cap b {
+  display: block;
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 19px;
+  line-height: 1;
+}
+.cell .cap span {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  opacity: 0.85;
+}
+.cell:hover {
+  box-shadow: 0 16px 40px rgba(106, 77, 136, 0.22);
+  transform: translateY(-3px);
+  text-decoration: none;
+}
+.cell:hover img { transform: scale(1.07); }
+.cell:hover::after { opacity: 0.8; }
+.cell:hover .cap { transform: translateY(0); opacity: 1; }
+.c1 { grid-column: span 3; grid-row: span 2; }
+.c2 { grid-column: span 3; }
+.c3 { grid-column: span 3; }
+.c4 { grid-column: span 2; }
+.c5 { grid-column: span 2; }
+.c6 { grid-column: span 2; }
+
+/* watercolor project cards */
+.two {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+.pcard {
+  position: relative;
+  background: var(--paper-elev);
+  border-radius: var(--r);
+  padding: 28px;
+  box-shadow: 0 10px 26px rgba(39, 34, 32, 0.07);
+  overflow: hidden;
+  color: inherit;
+  transition: transform 0.25s, box-shadow 0.25s;
+}
+.pcard:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 18px 40px rgba(106, 77, 136, 0.16);
+  text-decoration: none;
+}
+.pcard::before {
+  content: "";
+  position: absolute;
+  right: -30px;
+  top: -30px;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  filter: blur(9px);
+  opacity: 0.5;
+}
+.pcard:nth-child(1)::before { background: radial-gradient(circle, var(--teal), transparent 70%); }
+.pcard:nth-child(2)::before { background: radial-gradient(circle, var(--rose), transparent 70%); }
+.pcard h3 {
+  position: relative;
+  font-size: 24px;
+  margin-bottom: 8px;
+}
+.pcard p {
+  position: relative;
+  font-size: 15px;
+  color: var(--ink-soft);
+  margin-bottom: 16px;
+}
+.pcard .tags { position: relative; }
+
+/* writing strip */
+.posts {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+.post {
+  display: block;
+  border-left: 2px solid var(--plum);
+  padding: 4px 0 4px 16px;
+  color: inherit;
+}
+.post:hover { text-decoration: none; }
+.post .date {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  margin-bottom: 6px;
+}
+.post h3 {
+  font-size: 22px;
+  line-height: 1.12;
+  margin-bottom: 8px;
+}
+.post p {
+  font-size: 14px;
+  color: var(--ink-soft);
+  margin: 0;
+}
+
+/* on-load reveals (the bloom "settles in") */
+.hero--home .stamp { animation: rise 0.7s 0.05s both; }
+.hero--home h1 { animation: bloomIn 1.1s 0.15s both; }
+.hero--home .roles { animation: rise 0.7s 0.35s both; }
+.hero--home .lead { animation: rise 0.7s 0.5s both; }
+.hero--home .btn-row { animation: rise 0.7s 0.65s both; }
+.hero--home .splash { animation: fadeScale 1.4s 0.1s both; }
+.hero--home .log { animation: rise 0.8s 0.4s both; }
+@keyframes bloomIn { from { opacity: 0; filter: blur(16px); transform: translateY(14px) scale(0.98); } to { opacity: 1; filter: blur(0); transform: none; } }
+@keyframes rise { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+@keyframes fadeScale { from { opacity: 0; transform: scale(0.8); } to { opacity: 1; transform: scale(1); } }
+
+@media (max-width: 860px) {
+  .hero--home { grid-template-columns: 1fr; }
+  .splash { width: 360px; height: 260px; }
+  .bento { grid-template-columns: repeat(2, 1fr); grid-auto-rows: 160px; }
+  .c1 { grid-column: span 2; grid-row: span 2; }
+  .c2, .c3, .c4, .c5, .c6 { grid-column: span 1; grid-row: span 1; }
+  .two, .posts { grid-template-columns: 1fr; }
+}
+
+/* Honor reduced motion: hold the bloom still, keep everything visible. The drift
+   + load reveals are decorative, so when the OS asks for less motion we drop
+   them entirely (nothing is hidden behind an animation). */
+@media (prefers-reduced-motion: reduce) {
+  .blob,
+  .ed.live,
+  .hero--home .stamp,
+  .hero--home h1,
+  .hero--home .roles,
+  .hero--home .lead,
+  .hero--home .btn-row,
+  .hero--home .splash,
+  .hero--home .log {
+    animation: none !important;
+  }
+}
+
+.gallery-empty {
+  text-align: center;
+  padding-block: var(--space-6);
+}
+
+/* ---- Gallery: chips + search toolbar -------------------------------------- */
+/* Sticky under the nav so the filters stay reachable while scrolling a long
+   collage. Chips left (wrap/scroll), search right. */
+.gallery-toolbar {
+  position: sticky;
+  top: calc(var(--space-8) + var(--space-1));
+  z-index: 20;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-2);
+  margin-bottom: var(--space-4);
+  /* An intentional control panel on the raised surface (same token as the nav),
+     so it reads a touch lighter than the canvas — never darker — in both themes. */
+  padding: var(--space-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-elev); /* solid fallback (no backdrop-filter support) */
+  box-shadow: 0 1px 0 var(--border), 0 8px 24px rgba(0, 0, 0, 0.06);
+}
+@supports (backdrop-filter: blur(10px)) or (-webkit-backdrop-filter: blur(10px)) {
+  .gallery-toolbar {
+    background: color-mix(in srgb, var(--bg-elev) 85%, transparent);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+  }
+}
+html[data-theme="dark"] .gallery-toolbar {
+  box-shadow: 0 1px 0 var(--border), 0 10px 28px rgba(0, 0, 0, 0.35);
+}
+.gallery-search {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  margin-left: auto;
+  min-width: 12rem;
+  max-width: 22rem;
+  padding: 8px var(--space-2);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--bg); /* match the chips — a pill on the elevated toolbar */
+  color: var(--text-dim);
+}
+.gallery-search:focus-within {
+  border-color: var(--accent);
+}
+.gallery-search input {
+  flex: 1;
+  border: 0;
+  background: none;
+  color: var(--text);
+  font: inherit;
+  outline: none;
+}
+
+/* ---- Gallery: album filter chips ------------------------------------------ */
+/* One chip per album ("All" first). The active chip carries a watercolor dab
+   behind it — the same wash language as the nav tabs (url(#wash-bloom)). */
+.gallery-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+  min-width: 0;
+}
+.gchip {
+  position: relative;
+  isolation: isolate;
+  display: inline-flex;
+  align-items: center;
+  font: inherit;
+  font-size: var(--step-small);
+  font-weight: 600;
+  color: var(--text-dim);
+  background: var(--bg); /* canvas tone → reads as a pill on the elevated toolbar */
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 7px var(--space-2);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color var(--speed) ease-out, border-color var(--speed) ease-out,
+    transform var(--speed) ease-out;
+}
+.gchip .n {
+  font-family: var(--font-mono);
+  font-size: 0.78em;
+  opacity: 0.7;
+  margin-left: 6px;
+}
+.gchip:hover,
+.gchip:focus-visible {
+  color: var(--text);
+  transform: translateY(-1px);
+}
+.gchip.is-active {
+  color: var(--text);
+  border-color: transparent;
+}
+/* Watercolor dab bloom behind the active chip (carries its inline --w wash). */
+.gchip::before {
+  content: "";
+  position: absolute;
+  inset: -3px -2px;
+  z-index: -1;
+  border-radius: inherit;
+  background: var(--w, var(--lav));
+  opacity: 0;
+  transform: scale(0.7);
+  filter: url(#wash-bloom);
+  transition: opacity var(--speed) ease-out, transform var(--speed) ease-out;
+}
+.gchip.is-active::before {
+  opacity: 0.5;
+  transform: scale(1);
+}
+[data-theme="dark"] .gchip.is-active::before {
+  opacity: 0.4;
+}
+@media (prefers-reduced-motion: reduce) {
+  .gchip,
+  .gchip::before {
+    transition: none;
+  }
+}
+/* Narrow screens: the search takes the full first row and the chips become a
+   single horizontally scrollable strip (like the nav tabs) instead of stacking
+   into many rows — matters for photography's long album list. */
+@media (max-width: 640px) {
+  .gallery-search {
+    margin-left: 0;
+    max-width: none;
+    order: -1;
+    width: 100%;
+  }
+  .gallery-chips {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    margin-inline: calc(-1 * var(--space-1));
+    padding-inline: var(--space-1);
+  }
+  .gallery-chips::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* ---- Gallery: masonry via CSS columns -------------------------------------- */
+/* Dense pack like the home collage — same tight 0.36rem gutter. Aspect ratios vary,
+   so we don't fight them; we just tighten the gutters. --masonry-gap keeps the column
+   gutter and the row gutter (item margin-bottom) in sync. */
+.masonry {
+  --masonry-gap: 0.36rem;
+  column-count: 5;
+  column-gap: var(--masonry-gap);
+}
+.masonry__item {
+  break-inside: avoid;
+  /* Kill the browser's default <figure> margin (1em top, 40px sides) — that, not
+     the column gutter, was the big gap. Only the row gutter below remains. */
+  margin: 0 0 var(--masonry-gap);
+}
+.masonry__item.is-hidden {
+  display: none;
+}
+
+.thumb {
+  position: relative;
+  display: block;
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: var(--bg-elev);
+  cursor: zoom-in;
+}
+.thumb img {
+  transition: transform var(--speed) ease-out;
+}
+.thumb:hover img {
+  transform: scale(1.03);
+}
+.thumb__caption {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: var(--space-2);
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.7));
+  color: #fff; /* always on the dark photo scrim — white in both themes */
+  font-size: var(--step-small);
+  opacity: 0;
+  transition: opacity var(--speed) ease-out;
+}
+.thumb:hover .thumb__caption,
+.thumb:focus-visible .thumb__caption {
+  opacity: 1;
+}
+
+/* ---- Lightbox: ALWAYS DARK (deliberate exception to theming) --------------- */
+/* Locks page scroll while the lightbox is open (toggled by lightbox.js). */
+.no-scroll {
+  overflow: hidden;
+}
+.lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: var(--space-2);
+  background: rgba(8, 8, 10, 0.96); /* near-black, theme-independent */
+  padding: var(--space-3);
+}
+.lightbox.is-open {
+  display: flex;
+}
+/* Figure holds the stage + caption as one centred column that flexes to fill the
+   space between the top and the in-flow tools bar, so the caption can never ride
+   over the tools and always centres to the viewport (not just the image width). */
+.lightbox__figure {
+  margin: 0;
+  flex: 1 1 auto;
+  min-height: 0;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+}
+/* Stage = the crop window the (possibly zoomed) image pans within. It shrinks to
+   whatever height is left after the caption + tools, keeping the image contained. */
+.lightbox__stage {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1 1 auto;
+  min-height: 0;
+  max-width: min(92vw, 1400px);
+  overflow: hidden;
+  border-radius: 4px;
+  touch-action: none; /* we handle pan/pinch ourselves */
+}
+.lightbox__img {
+  max-width: min(92vw, 1400px);
+  max-height: 100%;
+  object-fit: contain;
+  transform-origin: center center;
+  will-change: transform;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+.lightbox__img.is-zoomable {
+  cursor: zoom-in;
+}
+.lightbox__img.is-zoomed {
+  cursor: grab;
+}
+.lightbox.is-panning .lightbox__img {
+  cursor: grabbing;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .lightbox__img {
+    transition: transform 120ms ease-out;
+  }
+  .lightbox.is-panning .lightbox__img {
+    transition: none; /* follow the finger/cursor 1:1 while dragging */
+  }
+}
+.lightbox__caption {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  color: #d9d9de;
+  font-size: var(--step-small);
+  text-align: center;
+  max-width: 70ch;
+}
+.lightbox__counter {
+  color: #8a8a92;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.04em;
+}
+.lightbox__btn {
+  position: absolute;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  color: #fff; /* always-dark lightbox — white in both themes */
+  width: 48px;
+  height: 48px;
+  border-radius: 999px;
+  font-size: 1.5rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.lightbox__btn:hover {
+  background: rgba(0, 0, 0, 0.7);
+}
+.lightbox__close {
+  top: var(--space-2);
+  right: var(--space-2);
+}
+.lightbox__prev {
+  left: var(--space-2);
+  top: 50%;
+  transform: translateY(-50%);
+}
+.lightbox__next {
+  right: var(--space-2);
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+/* Bottom toolbar: zoom out / level / zoom in / download. In-flow (not absolute)
+   so it always sits below the caption with the column gap between them. */
+.lightbox__tools {
+  position: relative;
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: 6px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+}
+.lightbox__tool {
+  position: static; /* override the absolute .lightbox__btn base */
+  width: 40px;
+  height: 40px;
+  border: 0;
+  background: none;
+}
+.lightbox__tool:hover {
+  background: rgba(255, 255, 255, 0.16);
+}
+.lightbox__zoom-reset {
+  width: auto;
+  min-width: 52px;
+  padding: 0 var(--space-1);
+  font-size: var(--step-small);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---- Project media (gallery strip + video) --------------------------------- */
+/* Reuses .thumb (so lightbox.js adopts these) but in a fixed-tile grid rather
+   than the masonry columns the photo galleries use. */
+.project-gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: var(--space-2);
+}
+.project-gallery .thumb {
+  aspect-ratio: 4 / 3;
+}
+.project-gallery .thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.project-video {
+  max-width: 880px;
+}
+.project-video video {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: var(--radius);
+  background: #000;
+}
+
+/* ---- Experience timeline --------------------------------------------------- */
+.timeline {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+.timeline__item {
+  display: grid;
+  grid-template-columns: 64px 1fr;
+  gap: var(--space-3);
+  align-items: start;
+}
+.timeline__logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 64px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-elev);
+  overflow: hidden;
+}
+.timeline__logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  padding: 6px;
+}
+.timeline__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-2);
+}
+.timeline__title {
+  margin: 0;
+  font-size: var(--step-h3);
+}
+.timeline__type {
+  align-self: center;
+}
+.timeline__meta {
+  color: var(--text-dim);
+  font-size: var(--step-small);
+  margin: var(--space-1) 0 0;
+}
+.timeline__highlights {
+  margin: var(--space-2) 0 0;
+  padding-left: 1.2em;
+}
+.timeline__highlights li {
+  margin-bottom: var(--space-1);
+}
+.timeline__body .tags {
+  margin-top: var(--space-2);
+}
+.timeline__note {
+  margin-top: var(--space-2);
+  color: var(--text-dim);
+}
+
+@media (max-width: 640px) {
+  .timeline__item {
+    grid-template-columns: 48px 1fr;
+    gap: var(--space-2);
+  }
+  .timeline__logo {
+    width: 48px;
+    height: 48px;
+  }
+}
+
+/* ---- Projects: timeline-style rows ----------------------------------------- */
+/* Reuses the experience timeline rhythm but with a wider 3:2 cover (not the 64px
+   logo chip) and the whole row as a clickable card. */
+.timeline--projects .timeline__item {
+  grid-template-columns: 200px 1fr;
+  gap: var(--space-4);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-elev);
+  padding: var(--space-3);
+  transition: transform var(--speed) ease-out, border-color var(--speed) ease-out,
+    box-shadow var(--speed) ease-out;
+}
+.timeline--projects .timeline__item--text {
+  grid-template-columns: 1fr;
+}
+.timeline--projects .timeline__item:hover {
+  transform: translateY(-3px);
+  border-color: var(--accent);
+  box-shadow: var(--shadow-soft);
+}
+/* `display: contents` lets the wrapping <a> stay fully clickable while its two
+   children (media + body) become the cells of the .timeline__item grid. */
+.project-row {
+  display: contents;
+  color: inherit;
+}
+.project-row:hover {
+  text-decoration: none;
+}
+.project-row__media {
+  display: block;
+  aspect-ratio: 3 / 2;
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: var(--bg);
+}
+.project-row__media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform var(--speed) ease-out;
+}
+.timeline--projects .timeline__item:hover .project-row__media img {
+  transform: scale(1.04);
+}
+.project-row__summary {
+  max-width: 70ch;
+  margin: var(--space-1) 0 0;
+}
+
+@media (max-width: 640px) {
+  .timeline--projects .timeline__item {
+    grid-template-columns: 1fr;
+    gap: var(--space-2);
+  }
+  .project-row__media {
+    max-height: 220px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .timeline--projects .timeline__item,
+  .project-row__media img {
+    transition: none;
+  }
+  .timeline--projects .timeline__item:hover {
+    transform: none;
+  }
+  .timeline--projects .timeline__item:hover .project-row__media img {
+    transform: none;
+  }
+}
+
+/* ---- Carousel (home "From the gallery") ------------------------------------ */
+/* Manual horizontal scroll-snap strip of the newest gallery items. Native swipe
+   works with no JS; carousel.js only reveals/steps the arrow buttons. No autoplay. */
+.carousel {
+  position: relative;
+}
+.carousel__track {
+  display: flex;
+  gap: var(--space-3);
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none; /* Firefox — hide the bar; swipe/scroll still works */
+  -ms-overflow-style: none; /* old Edge/IE */
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.carousel__track::-webkit-scrollbar {
+  display: none; /* Chrome/Safari */
+}
+.carousel__slide {
+  flex: 0 0 clamp(240px, 70%, 340px);
+  scroll-snap-align: start;
+}
+.carousel__arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  background: var(--bg-elev);
+  color: var(--text);
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+  box-shadow: var(--shadow-soft);
+  transition: border-color var(--speed) ease-out, color var(--speed) ease-out;
+  z-index: 1;
+}
+.carousel__arrow:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.carousel__arrow:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+.carousel__arrow:disabled {
+  opacity: 0.35;
+  cursor: default;
+  box-shadow: none;
+}
+.carousel__arrow[hidden] {
+  display: none;
+}
+.carousel__arrow--prev {
+  left: calc(-1 * var(--space-2));
+}
+.carousel__arrow--next {
+  right: calc(-1 * var(--space-2));
+}
+/* Touch devices swipe — hide the arrows there. */
+@media (hover: none) {
+  .carousel__arrow {
+    display: none;
+  }
+}
+/* Pagination dots (built in carousel.js) — position + jump-to-slide. Shown on all
+   devices since they're the touch affordance once arrows are hidden. */
+.carousel__dots {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-1);
+  margin-top: var(--space-2);
+}
+.carousel__dot {
+  padding: 8px; /* small visual dot, ~24px tap target */
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  line-height: 0;
+}
+.carousel__dot::before {
+  content: "";
+  display: block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--border);
+  transition: background var(--speed) ease-out, transform var(--speed) ease-out;
+}
+.carousel__dot.is-active::before {
+  background: var(--accent);
+  transform: scale(1.25);
+}
+.carousel__dot:hover::before {
+  background: var(--accent-hover);
+}
+.carousel__dot:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 50%;
+}
+@media (prefers-reduced-motion: reduce) {
+  .carousel__dot::before {
+    transition: none;
+  }
+}
+
+/* ---- Footer ---------------------------------------------------------------- */
+.site-footer {
+  border-top: 1px solid var(--border);
+  background: var(--bg-elev);
+  padding-block: var(--space-4);
+  color: var(--text-dim);
+  font-size: var(--step-small);
+}
+.site-footer .container-wide {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  align-items: center;
+  justify-content: space-between;
+}
+.social-links {
+  display: flex;
+  gap: var(--space-2);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* ---- Responsive ------------------------------------------------------------ */
+@media (max-width: 1024px) {
+  .masonry {
+    column-count: 3;
+  }
+}
+
+@media (max-width: 640px) {
+  :root {
+    --step-h1: 2rem;
+    --step-h2: 1.5rem;
+  }
+  .masonry {
+    --masonry-gap: 0.26rem;
+    column-count: 2;
+  }
+
+  /* Mobile nav: brand + toggle stay on row one; the wash tabs drop to a second
+     row that scrolls horizontally (no hamburger, no overlay). */
+  .nav {
+    flex-wrap: wrap;
+    row-gap: 0.15rem;
+    padding-bottom: 0.4rem;
+  }
+  .nav__brand {
+    margin-right: auto; /* brand left, theme toggle pushed right on row one */
+  }
+  .nav__tabs {
+    order: 3;
+    width: 100%;
+    margin: 0;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 0.15rem;
+  }
+  .nav__tabs::-webkit-scrollbar {
+    display: none;
+  }
+  .nav__tab {
+    flex: none;
+  }
+}
+
+/* ---- Scroll reveal (progressive enhancement) ------------------------------
+   Elements are hidden ONLY under html.reveal, which the pre-paint script adds
+   solely when JS + IntersectionObserver are available AND motion is allowed.
+   Without JS, or with reduced motion, content shows by default — never trapped
+   hidden. reveal.js adds .is-visible as each element scrolls into view. */
+.reveal [data-reveal] {
+  opacity: 0;
+  transform: translateY(18px);
+  transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+  will-change: opacity, transform;
+}
+.reveal [data-reveal].is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+/* ---- Reduced motion -------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}

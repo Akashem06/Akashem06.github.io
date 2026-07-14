@@ -1,0 +1,51 @@
+---
+layout: default
+nav: projects
+title: Projects
+description: Embedded firmware and engineering projects by Aryan Kashem - a few, well documented.
+permalink: /projects/
+---
+{%- assign n = site.projects | size -%}
+{%- capture eyebrow -%}{{ n }} build{% unless n == 1 %}s{% endunless %}{%- endcapture -%}
+{% include masthead.html title="Projects" eyebrow=eyebrow lede="A few firmware and systems projects, written up properly instead of just listed." wide=true %}
+
+<div class="container-wide">
+  {% if site.projects.size > 0 %}
+  {%- comment -%} Projects as a responsive 2-up card grid (.pcards.g2). Each card is
+    a plain link to that project's own page. No JS, no fetch panel: native navigation. {%- endcomment -%}
+  <div class="pcards g2" data-reveal>
+    {% assign projects = site.projects | sort: "date" | reverse %}
+    {% for project in projects %}
+    {%- assign cover = project.image -%}
+    {%- if cover == nil and project.gallery -%}{%- assign cover = project.gallery.first.thumb | default: project.gallery.first.image -%}{%- endif -%}
+    {%- if cover -%}
+      {%- assign cover_hit = site.static_files | where: "path", cover -%}
+      {%- unless cover_hit.size > 0 -%}{%- assign cover = nil -%}{%- endunless -%}
+    {%- endif -%}
+    {%- comment -%} Split a "Short Name: long subtitle" title so the display text stays
+      short and the spec drops to the subtitle line. No colon → summary is the subtitle. {%- endcomment -%}
+    {%- assign t = project.title -%}
+    {%- if t contains ': ' -%}
+      {%- assign main_title = t | split: ': ' | first -%}
+      {%- assign sub_title = t | remove_first: main_title | remove_first: ': ' -%}
+    {%- else -%}
+      {%- assign main_title = t -%}
+      {%- assign sub_title = project.summary -%}
+    {%- endif -%}
+    {%- assign hue = forloop.index | modulo: 8 | plus: 1 -%}
+    <a class="pcard" href="{{ project.url | relative_url }}">
+      <span class="pcard__cover ph--{{ hue }}" aria-hidden="true">{% if cover %}<img src="{{ cover | relative_url }}" alt="" loading="lazy" />{% endif %}</span>
+      <div class="pcard__body">
+        {% if project.featured %}<span class="pcard__chip">★ Featured</span>{% endif %}
+        <h3 class="pcard__title">{{ main_title }}</h3>
+        {% if sub_title %}<p class="pcard__sub">{{ sub_title }}</p>{% endif %}
+        {% if project.stack %}<p class="pcard__stack">{{ project.stack | join: " · " }}</p>{% endif %}
+        <span class="pcard__year">{% if project.date %}{{ project.date | date: "%Y" }}{% endif %}</span>
+      </div>
+    </a>
+    {% endfor %}
+  </div>
+  {% else %}
+  <p class="muted">Projects are on the way.</p>
+  {% endif %}
+</div>

@@ -1,0 +1,28 @@
+{%- comment -%}
+  Social handles: GitHub is known; others stay TODO until the owner provides them.
+  No plaintext email is committed - the contact link is assembled in JS (see theme.js).
+{%- endcomment -%}
+<footer class="site-footer">
+  <div class="container-wide">
+    <ul class="social-links" aria-label="Social and contact">
+      <li>
+        <a class="social-link" href="https://github.com/{{ site.social.github }}" rel="me noopener" target="_blank">GitHub</a>
+      </li>
+      {%- if site.social.linkedin and site.social.linkedin != "" %}
+      <li>
+        <a class="social-link" href="https://www.linkedin.com/in/{{ site.social.linkedin }}/" rel="me noopener" target="_blank">LinkedIn</a>
+      </li>
+      {%- endif %}
+      {%- if site.social.twitter and site.social.twitter != "" %}
+      <li>
+        <a class="social-link" href="https://x.com/{{ site.social.twitter }}" rel="me noopener" target="_blank">X</a>
+      </li>
+      {%- endif %}
+      <li>
+        <!-- Email is assembled client-side from split parts to avoid committing it in plaintext. -->
+        <a class="social-link" id="contact-link" href="#"
+           data-user="{{ site.contact_user }}" data-domain="{{ site.contact_domain }}">Contact</a>
+      </li>
+    </ul>
+  </div>
+</footer>

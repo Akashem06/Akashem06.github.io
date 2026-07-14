@@ -1,0 +1,80 @@
+---
+layout: default
+---
+<article class="article container{% if page.collection == 'projects' %} article--project{% endif %}">
+  <header class="article__header">
+    {% if page.collection == 'projects' %}<a class="article__back" href="{{ '/projects/' | relative_url }}">← Projects</a>{% endif %}
+    <h1>{{ page.title }}</h1>
+    {% if page.summary %}<p class="article__summary">{{ page.summary }}</p>{% endif %}
+
+    {% if page.repo or page.demo %}
+    <p class="btn-row">
+      {% if page.demo %}<a class="btn" href="{{ page.demo }}">Live demo</a>{% endif %}
+      {% if page.repo %}<a class="btn btn--ghost" href="{{ page.repo }}">Repository</a>{% endif %}
+    </p>
+    {% endif %}
+
+    {% if page.stack %}
+    <ul class="tags">
+      {% for tech in page.stack %}<li class="tag">{{ tech }}</li>{% endfor %}
+    </ul>
+    {% endif %}
+  </header>
+
+  {%- comment -%}
+    Project media. The gallery reuses the site lightbox: lightbox.js adopts any
+    `.thumb` anchors inside `#gallery` (it doesn't need gallery.js), so the strip
+    below gets the same zoom/pan/download viewer as the photo galleries.
+  {%- endcomment -%}
+  {% if page.video %}
+  <section class="section project-video" data-reveal>
+    <video controls playsinline preload="metadata"
+      {% if page.video_poster %}poster="{{ page.video_poster | relative_url }}"{% endif %}>
+      <source src="{{ page.video | relative_url }}" type="video/mp4" />
+      <p>Your browser can't play this video.
+        <a href="{{ page.video | relative_url }}">Download it instead</a>.</p>
+    </video>
+  </section>
+  {% endif %}
+
+  {% if page.gallery %}
+  <section class="section" data-reveal aria-label="Project images">
+    <div class="project-gallery" id="gallery">
+      {% for shot in page.gallery %}
+      <a class="thumb"
+        href="{{ shot.image | relative_url }}"
+        data-caption="{{ page.title }}"
+        aria-label="View image: {{ shot.alt | escape }}">
+        <img src="{{ shot.thumb | default: shot.image | relative_url }}"
+          alt="{{ shot.alt }}" loading="lazy" />
+      </a>
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
+
+  {% if page.features %}
+  <section class="section">
+    {% include bloom-head.html title="Highlights" %}
+    <ul>
+      {% for f in page.features %}<li>{{ f }}</li>{% endfor %}
+    </ul>
+  </section>
+  {% endif %}
+
+  {% if page.challenges %}
+  <section class="section">
+    {% include bloom-head.html title="Challenges" %}
+    <p>{{ page.challenges }}</p>
+  </section>
+  {% endif %}
+
+  <div class="article__body">
+    {{ content }}
+  </div>
+</article>
+
+{% if page.gallery %}
+{% include lightbox.html %}
+<script src="{{ '/assets/js/lightbox.js' | relative_url }}" defer></script>
+{% endif %}

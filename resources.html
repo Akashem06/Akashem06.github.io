@@ -1,0 +1,24 @@
+---
+layout: default
+nav: resources
+title: Resources
+description: Tools, references, and links Aryan Kashem recommends for embedded engineering, photography, and travel.
+permalink: /resources/
+resources: []
+---
+{% include masthead.html title="Resources" eyebrow="Toolbox" lede="Tools, references, and links I keep coming back to, for embedded work, photography, and travel." %}
+
+<div class="container">
+  {% if page.resources.size > 0 %}
+  <div class="card-grid" data-reveal>
+    {% for r in page.resources %}
+    <a class="card" href="{{ r.url }}"{% if r.url != "#" %} rel="noopener" target="_blank"{% endif %}>
+      <h2 class="card__title">{{ r.title }}</h2>
+      {% if r.note %}<p class="muted">{{ r.note }}</p>{% endif %}
+    </a>
+    {% endfor %}
+  </div>
+  {% else %}
+  <p class="muted">Resource list coming soon.</p>
+  {% endif %}
+</div>

@@ -1,0 +1,30 @@
+# Jekyll
+_site/
+.sass-cache/
+.jekyll-cache/
+.jekyll-metadata
+vendor/
+.bundle/
+
+# Local-only planning - never commit
+STRATEGY.local.md
+*.local.md
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+*.swp
+# Ignore local VS Code settings, but keep the shared extension recommendation.
+.vscode/*
+!.vscode/extensions.json
+
+# Python tooling (tools/)
+__pycache__/
+*.pyc
+.venv/
+tools/.venv/
+
+# Env / secrets
+.env
+.env.*

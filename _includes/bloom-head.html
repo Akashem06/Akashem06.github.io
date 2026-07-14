@@ -1,0 +1,18 @@
+{%- comment -%}
+  Section heading over a soft watercolor BLOOM that seeps in as it scrolls into
+  view (concept 03 — the home page's language applied to section titles). Rides the
+  site reveal system (data-reveal + .is-visible via reveal.js): no-JS and
+  reduced-motion visitors just see the heading with the wash already shown, so it
+  never gates content. Params:
+    title (required) — heading text
+    id    (optional) — id on the <h2> (for in-page anchors)
+  (see docs/03-user-interface)
+{%- endcomment -%}
+<div class="bloom-head" data-reveal>
+  <span class="bloom-head__wash" aria-hidden="true">
+    <i style="--wash:var(--lav);--l:12%;--t:44%"></i>
+    <i style="--wash:var(--peach);--l:33%;--t:66%"></i>
+    <i style="--wash:var(--sky);--l:54%;--t:40%"></i>
+  </span>
+  <h2 class="bloom-head__title"{% if include.id %} id="{{ include.id }}"{% endif %}>{{ include.title }}</h2>
+</div>

@@ -1,0 +1,224 @@
+---
+layout: default
+nav: home
+title: Aryan Kashem
+description: Embedded firmware engineer, photographer, and sketch artist. Firmware, photography, sketches, and travel, gathered in one place.
+---
+{%- comment -%}
+  The home landing is "the collage": name + roles + one line, with the actual WORK
+  (photography + sketches + project shots, balanced so no one source dominates)
+  collaged across the whole background, heavily washed so type dominates. The wall drifts with the cursor (parallax); hovering a section door
+  lights its color wash AND floats that section's images forward. Locked to the
+  "dense" pack. The centre is a static multi-colour WATERCOLOR BLOOM (7 washes with
+  wet #bleed edges, breathing slowly, no cursor-tracking); a soft paper halo hugs
+  the name so it keeps contrast over the colour. All styles inline + scoped under
+  .stage so it never leaks into the other pages. (see docs/03-user-interface)
+{%- endcomment -%}
+
+{% assign art = site.galleries | where: "bucket", "art" | sort: "date" | reverse %}
+{% assign photo = site.galleries | where: "bucket", "photography" | sort: "date" | reverse %}
+{% assign projects = site.projects | sort: "date" | reverse %}
+
+<section class="stage" id="stage">
+
+  {%- comment -%}
+    The collage — a balanced mix of the actual WORK across three sources, so no one
+    kind drowns the wall (photography alone is 100+ items). All sketches + all project
+    shots (covers + galleries) go in; photography is capped to a recent slice. Every
+    tile carries a data-type so hovering a section door floats that source forward.
+    Tiles are Fisher–Yates shuffled on load (see script), so DOM order doesn't matter.
+  {%- endcomment -%}
+  <div class="collage" id="collage" aria-hidden="true">
+    {%- comment -%} projects: cover + any gallery shots (hardware / firmware / screens) {%- endcomment -%}
+    {% for pr in projects %}
+      {% if pr.image %}<span class="ctile" data-type="project"><img src="{{ pr.image | relative_url }}" alt="" loading="lazy"/></span>{% endif %}
+      {% for shot in pr.gallery %}<span class="ctile" data-type="project"><img src="{{ shot.thumb | default: shot.image | relative_url }}" alt="" loading="lazy"/></span>{% endfor %}
+    {% endfor %}
+    {%- comment -%} sketches: all of them (small body of work — keep it fully represented) {%- endcomment -%}
+    {% for a in art %}<span class="ctile" data-type="sketch"><img src="{{ a.thumb | default: a.image | relative_url }}" alt="" loading="lazy"/></span>{% endfor %}
+    {%- comment -%} photography: a recent slice so it complements, not dominates {%- endcomment -%}
+    {% assign photo_wall = photo | slice: 0, 78 %}
+    {% for p in photo_wall %}<span class="ctile" data-type="photo"><img src="{{ p.thumb | default: p.image | relative_url }}" alt="" loading="lazy"/></span>{% endfor %}
+  </div>
+
+  {%- comment -%} legibility scrim + a centered multi-colour watercolor bloom {%- endcomment -%}
+  <div class="stage__scrim" aria-hidden="true"></div>
+  <div class="stage__splash" aria-hidden="true">
+    <span class="sblob" style="--wash:var(--lav);   --l:45%; --t:39%; --s:360px; --o:.54; --dur:17s; --delay:0s"></span>
+    <span class="sblob" style="--wash:var(--sky);    --l:57%; --t:44%; --s:340px; --o:.5;  --dur:19s; --delay:-3s"></span>
+    <span class="sblob" style="--wash:var(--peach);  --l:50%; --t:35%; --s:300px; --o:.5;  --dur:15s; --delay:-6s"></span>
+    <span class="sblob" style="--wash:var(--sage);   --l:47%; --t:51%; --s:320px; --o:.46; --dur:21s; --delay:-2s"></span>
+    <span class="sblob" style="--wash:var(--gold);   --l:59%; --t:37%; --s:260px; --o:.46; --dur:16s; --delay:-9s"></span>
+    <span class="sblob" style="--wash:var(--rose);   --l:41%; --t:47%; --s:280px; --o:.48; --dur:20s; --delay:-5s"></span>
+    <span class="sblob" style="--wash:var(--teal);   --l:54%; --t:53%; --s:250px; --o:.44; --dur:18s; --delay:-11s"></span>
+  </div>
+
+  <div class="stage__inner">
+    <p class="kick">firmware <b>·</b> photography <b>·</b> sketches <b>·</b> travel</p>
+    <h1 class="bigname">Aryan Kashem</h1>
+    <p class="lead">Embedded firmware engineer at Waterloo who shoots photos and draws.
+      Bare-metal systems by day; a camera and a sketchbook the rest of the time.</p>
+
+    <nav class="enter" aria-label="Sections">
+      <a class="door" href="{{ '/blog/'         | relative_url }}" data-type="writing"    style="--wash:var(--lav)"><span>Blog</span><small>notes &amp; essays</small></a>
+      <a class="door" href="{{ '/photography/'  | relative_url }}" data-type="photo"      style="--wash:var(--sky)"><span>Photography</span><small>where I've been</small></a>
+      <a class="door" href="{{ '/art/'          | relative_url }}" data-type="sketch"     style="--wash:var(--peach)"><span>Sketches</span><small>graphite studies</small></a>
+      <a class="door" href="{{ '/projects/'     | relative_url }}" data-type="project"    style="--wash:var(--sage)"><span>Projects</span><small>firmware &amp; systems</small></a>
+      <a class="door" href="{{ '/experiences/'  | relative_url }}" data-type="experience" style="--wash:var(--gold)"><span>Experience</span><small>the résumé</small></a>
+    </nav>
+  </div>
+</section>
+
+<style>
+  /* Home fits ONE screen — practically no scroll. Make the page a flex column
+     (header · main · footer) filling the viewport; the stage flexes to take the
+     leftover space so the footer sits at the bottom with nothing to scroll past.
+     The collage is fixed, so it never adds height either way. */
+  body:has(.stage){display:flex;flex-direction:column;min-height:100svh}
+  body:has(.stage) main{flex:1 1 auto;min-height:0;display:flex;flex-direction:column}
+  /* stage is NOT a stacking context / clip — so the fixed collage can bleed
+     out behind the header and footer instead of stopping at the section edge */
+  .stage{position:relative;flex:1 1 auto;min-height:0;display:grid;place-items:center;
+    padding:1.4rem 1.2rem}
+
+  /* ---- the collage: a FIXED full-viewport layer the whole page floats over,
+     so it runs underneath the (translucent) header and the footer. Cell/gap are
+     locked to the "dense" pack. ---- */
+  .collage{position:fixed;inset:-6% -4%;z-index:0;display:grid;--cell:116px;--gap:.36rem;
+    grid-template-columns:repeat(auto-fill,minmax(var(--cell),1fr));grid-auto-rows:var(--cell);
+    grid-auto-flow:dense;gap:var(--gap);
+    opacity:.62;filter:saturate(.95);pointer-events:none;
+    -webkit-mask-image:radial-gradient(80% 66% at 50% 44%,transparent 0,transparent 30%,#000 60%);
+            mask-image:radial-gradient(80% 66% at 50% 44%,transparent 0,transparent 30%,#000 60%);
+    -webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;
+    transform:translate3d(0,0,0);transition:opacity .5s ease;will-change:transform}
+  html[data-theme="dark"] .collage{opacity:.7;filter:saturate(.8) brightness(.92)}
+  @media (max-width:620px){.collage{--cell:82px;--gap:.26rem}}
+  .ctile{border-radius:8px;overflow:hidden;transition:opacity .45s ease,filter .45s ease}
+  .ctile img{width:100%;height:100%;object-fit:cover;display:block}
+  .ctile--tall{grid-row:span 2}
+  .ctile--wide{grid-column:span 2}
+  .ctile--big{grid-row:span 2;grid-column:span 2}
+  /* when a door is hovered, matching tiles surge forward, others recede */
+  .collage.focus .ctile{opacity:.32;filter:grayscale(.4)}
+  .collage.focus .ctile.hot{opacity:1;filter:none}
+  .stage:has(.door:hover) .collage{opacity:.5}
+
+  /* soft scrim so text always wins against the collage */
+  .stage__scrim{position:absolute;inset:0;z-index:1;pointer-events:none;
+    background:radial-gradient(70% 60% at 50% 40%,color-mix(in srgb,var(--bg) 82%,transparent),transparent 75%)}
+
+  /* ---- centered watercolor bloom: a contained multi-colour explosion, static.
+     Each blob carries its own wash, position (--l/--t), size (--s), opacity (--o)
+     and a slow out-of-phase breathe. multiply on paper → screen on night. ---- */
+  .stage__splash{position:absolute;inset:0;z-index:1;pointer-events:none;overflow:hidden;
+    mix-blend-mode:multiply}
+  html[data-theme="dark"] .stage__splash{mix-blend-mode:screen}
+  .sblob{position:absolute;left:var(--l,50%);top:var(--t,42%);
+    width:var(--s,320px);aspect-ratio:1;border-radius:50%;
+    background:radial-gradient(circle at 50% 50%,color-mix(in srgb,var(--wash) 92%,transparent),transparent 62%);
+    filter:url(#bleed) blur(5px);opacity:var(--o,.5);will-change:transform;
+    transform:translate(-50%,-50%);
+    animation:bloom var(--dur,18s) ease-in-out var(--delay,0s) infinite}
+  html[data-theme="dark"] .sblob{opacity:.42}
+  @keyframes bloom{
+    0%,100%{transform:translate(-50%,-50%) scale(1) rotate(0deg)}
+    33%    {transform:translate(-47%,-54%) scale(1.09) rotate(5deg)}
+    66%    {transform:translate(-54%,-48%) scale(.94) rotate(-4deg)}
+  }
+  @media (max-width:620px){.sblob{width:calc(var(--s,320px)*.7)}}
+
+  /* ---- centered identity ---- */
+  .stage__inner{position:relative;z-index:2;text-align:center;max-width:760px}
+  /* soft paper halo hugging the text so the name keeps contrast over the bloom */
+  .stage__inner::before{content:"";position:absolute;z-index:-1;inset:-14% -12%;
+    background:radial-gradient(58% 56% at 50% 44%,color-mix(in srgb,var(--bg) 74%,transparent),transparent 72%)}
+  .kick{font-family:var(--font-mono);font-size:.8rem;letter-spacing:.08em;color:var(--text-dim);margin:0 0 .6rem}
+  .kick b{color:var(--accent);font-weight:400}
+  .bigname{font-family:var(--font-display);font-weight:400;line-height:.92;letter-spacing:-.015em;
+    font-size:clamp(3.2rem,12vw,7.5rem);margin:0}
+  .lead{max-width:52ch;margin:1rem auto 0;color:var(--text-dim);font-size:1.02rem;line-height:1.55}
+
+  /* ---- section doors ---- */
+  .enter{display:flex;flex-wrap:wrap;justify-content:center;gap:.6rem;margin-top:2.2rem}
+  .door{position:relative;display:flex;flex-direction:column;gap:.15rem;text-decoration:none;
+    padding:.7rem 1.15rem;border-radius:12px;border:1px solid var(--border);background:var(--bg-elev);
+    overflow:hidden;transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease}
+  .door::before{content:"";position:absolute;inset:0;z-index:-1;opacity:0;transition:opacity .22s ease;
+    background:radial-gradient(120% 130% at 50% 120%,color-mix(in srgb,var(--wash) 70%,transparent),transparent 70%)}
+  .door:hover,.door:focus-visible{transform:translateY(-3px);border-color:color-mix(in srgb,var(--wash) 60%,var(--border));
+    box-shadow:0 12px 30px rgba(60,45,35,.16);outline:none}
+  .door:hover::before,.door:focus-visible::before{opacity:1}
+  .door span{font-family:var(--font-display);font-weight:400;font-size:1.15rem;color:var(--text)}
+  .door small{font-family:var(--font-mono);font-size:.66rem;letter-spacing:.03em;color:var(--text-dim)}
+
+  @media (max-width:620px){
+    .enter{gap:.45rem}
+    .door{flex:1 1 42%;padding:.6rem .8rem}
+  }
+  @media (prefers-reduced-motion:reduce){
+    .collage,.ctile,.door{transition:none}
+    .collage{transform:none!important}
+    .sblob{animation:none}
+  }
+
+  /* --- scoped tweaks for this immersive page only (via :has). The nav layout is
+     deliberately LEFT untouched, so the header is identical on every page. --- */
+  /* header + footer ride ABOVE the fixed collage so it bleeds under them */
+  body:has(.stage) .site-header{z-index:30}
+  body:has(.stage) .site-footer{position:relative;z-index:5}
+</style>
+
+<script>
+(function(){
+  var collage=document.getElementById('collage'), stage=document.getElementById('stage');
+  if(!collage) return;
+
+  // truly random each load — Fisher–Yates shuffle the tiles, then re-drop them
+  var arr=Array.prototype.slice.call(collage.querySelectorAll('.ctile'));
+  for(var s=arr.length-1;s>0;s--){ var k=Math.random()*(s+1)|0; var tmp=arr[s]; arr[s]=arr[k]; arr[k]=tmp; }
+  var frag=document.createDocumentFragment();
+  arr.forEach(function(el){
+    el.classList.remove('ctile--tall','ctile--wide','ctile--big');
+    var r=Math.random();               // random footprint = varied wall, dense-packed
+    if(r<0.08) el.classList.add('ctile--big');
+    else if(r<0.30) el.classList.add('ctile--tall');
+    else if(r<0.46) el.classList.add('ctile--wide');
+    frag.appendChild(el);
+  });
+  collage.appendChild(frag);
+
+  var tiles=collage.querySelectorAll('.ctile');
+  var reduce=window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+
+  // cursor parallax — the collage drifts opposite the pointer (the bloom stays put)
+  if(!reduce){
+    var tx=0,ty=0,cx=0,cy=0,raf=null;
+    stage.addEventListener('pointermove', function(e){
+      var r=stage.getBoundingClientRect();
+      tx=((e.clientX-r.left)/r.width - .5) * -26;
+      ty=((e.clientY-r.top)/r.height - .5) * -18;
+      if(!raf) raf=requestAnimationFrame(loop);
+    });
+    stage.addEventListener('pointerleave', function(){ tx=0;ty=0; if(!raf) raf=requestAnimationFrame(loop); });
+    function loop(){
+      cx+=(tx-cx)*.08; cy+=(ty-cy)*.08;
+      collage.style.transform='translate3d('+cx.toFixed(2)+'px,'+cy.toFixed(2)+'px,0)';
+      if(Math.abs(tx-cx)>.1||Math.abs(ty-cy)>.1){ raf=requestAnimationFrame(loop); } else { raf=null; }
+    }
+  }
+
+  // hovering a door floats that section's images forward
+  document.querySelectorAll('.door').forEach(function(d){
+    var type=d.dataset.type;
+    d.addEventListener('pointerenter', function(){
+      collage.classList.add('focus');
+      tiles.forEach(function(t){ t.classList.toggle('hot', t.dataset.type===type); });
+    });
+    d.addEventListener('pointerleave', function(){
+      collage.classList.remove('focus');
+      tiles.forEach(function(t){ t.classList.remove('hot'); });
+    });
+  });
+})();
+</script>

@@ -1,0 +1,75 @@
+---
+layout: default
+nav: experiences
+title: Experience
+description: Work history of Aryan Kashem. Embedded firmware roles, internships, and the systems worked on.
+permalink: /experiences/
+---
+{%- assign n = site.experiences | size -%}
+{%- capture eyebrow -%}{{ n }} role{% unless n == 1 %}s{% endunless %}{%- endcapture -%}
+{% include masthead.html title="Experience" eyebrow=eyebrow lede="Roles and internships — the teams, the systems I worked on, and what I shipped." wide=true %}
+
+<div class="container-wide">
+  {% if site.experiences.size > 0 %}
+  {%- comment -%} Roles rendered as "personnel files": dossier cards with a crimson
+    top edge, a record tag, a mono metadata grid, and the resume bullets. Roles that
+    carry a `gallery` also show a photo strip; all strips share one `#gallery` id so
+    the site lightbox (adopts `.thumb` anchors) walks every photo. {%- endcomment -%}
+  {% assign roles = site.experiences | sort: "date" | reverse %}
+  {% assign has_shots = false %}
+  {% for role in roles %}{% if role.gallery %}{% assign has_shots = true %}{% endif %}{% endfor %}
+  <ol class="files g2" data-reveal {% if has_shots %}id="gallery"{% endif %}>
+    {% for role in roles %}
+    <li class="file">
+      {% if role.logo %}<img class="file__logo" src="{{ role.logo | relative_url }}" alt="{{ role.company }} logo" loading="lazy" />{% endif %}
+      <div class="file__tag">Record {{ forloop.index | prepend: '0' | slice: -2, 2 }} · {% if role.end_date %}{{ role.type | default: 'Closed' }}{% else %}Active{% endif %}</div>
+      <h2 class="file__role">{{ role.title }}</h2>
+
+      <div class="file__meta">
+        <span><b>Company</b>{% if role.company_url %}<a href="{{ role.company_url }}" rel="noopener">{{ role.company }}</a>{% else %}{{ role.company }}{% endif %}</span>
+        {% if role.type %}<span><b>Type</b>{{ role.type }}</span>{% endif %}
+        {% if role.location %}<span><b>Location</b>{{ role.location }}</span>{% endif %}
+        {% if role.start_date %}<span><b>Dates</b>{{ role.start_date }}{% if role.end_date %} to {{ role.end_date }}{% else %} to Present{% endif %}</span>{% endif %}
+      </div>
+
+      {% if role.highlights %}
+      <ul class="file__highlights">
+        {% for point in role.highlights %}<li>{{ point }}</li>{% endfor %}
+      </ul>
+      {% endif %}
+
+      {% if role.stack %}
+      <ul class="tags">
+        {% for tech in role.stack %}<li class="tag">{{ tech }}</li>{% endfor %}
+      </ul>
+      {% endif %}
+
+      {% if role.content != "" %}
+      <div class="file__note">{{ role.content }}</div>
+      {% endif %}
+
+      {% if role.gallery %}
+      <div class="file__shots" aria-label="Photos from {{ role.company }}">
+        {% for shot in role.gallery %}
+        <a class="thumb"
+          href="{{ shot.image | relative_url }}"
+          data-caption="{{ role.company }} — {{ role.title }}"
+          aria-label="View image: {{ shot.alt | escape }}">
+          <img src="{{ shot.thumb | default: shot.image | relative_url }}"
+            alt="{{ shot.alt }}" loading="lazy" />
+        </a>
+        {% endfor %}
+      </div>
+      {% endif %}
+    </li>
+    {% endfor %}
+  </ol>
+  {% else %}
+  <p class="muted">Experience is on the way.</p>
+  {% endif %}
+</div>
+
+{% if has_shots %}
+{% include lightbox.html %}
+<script src="{{ '/assets/js/lightbox.js' | relative_url }}" defer></script>
+{% endif %}

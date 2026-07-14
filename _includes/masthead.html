@@ -1,0 +1,26 @@
+{%- comment -%}
+  Page masthead — replaces the old crimson `band--red` banners. Echoes the home
+  page: a small, static multi-colour watercolor BLOOM (wet #bleed edges, breathing
+  slowly) sitting behind a big display title, with an optional mono eyebrow, a thin
+  rule, and an optional lede. Params:
+    title   (required) — the big heading
+    eyebrow (optional) — small mono kicker above it (e.g. a count)
+    lede    (optional) — one-line intro under the rule
+    wide    (optional) — use the wide container (galleries)
+  (see docs/03-user-interface)
+{%- endcomment -%}
+<header class="masthead" data-reveal>
+  <div class="{% if include.wide %}container-wide{% else %}container{% endif %} masthead__inner">
+    <div class="masthead__bloom" aria-hidden="true">
+      <span class="mblob" style="--wash:var(--lav);  --l:10%; --t:46%; --s:190px; --o:.58; --dur:17s; --delay:0s"></span>
+      <span class="mblob" style="--wash:var(--sky);  --l:24%; --t:64%; --s:160px; --o:.54; --dur:19s; --delay:-4s"></span>
+      <span class="mblob" style="--wash:var(--peach);--l:3%;  --t:70%; --s:140px; --o:.52; --dur:15s; --delay:-7s"></span>
+      <span class="mblob" style="--wash:var(--gold); --l:31%; --t:34%; --s:150px; --o:.5;  --dur:21s; --delay:-2s"></span>
+      <span class="mblob" style="--wash:var(--rose); --l:16%; --t:52%; --s:140px; --o:.52; --dur:18s; --delay:-9s"></span>
+    </div>
+    {% if include.eyebrow %}<p class="masthead__eyebrow">{{ include.eyebrow }}</p>{% endif %}
+    <h1 class="masthead__title">{{ include.title }}</h1>
+    <hr class="masthead__rule" />
+    {% if include.lede %}<p class="masthead__lede">{{ include.lede }}</p>{% endif %}
+  </div>
+</header>
