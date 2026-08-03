@@ -4,12 +4,16 @@ The site's top-level navigation and what belongs in each section. Keep the nav t
 
 ## Nav order
 
-`Home · Blog · Projects · Experience · Photography · Art · Resources`
+`Home · Blog · Projects · Experience · Photography · Art · Me · Resources`
 
 (On mobile, collapse to a hamburger. Keep order identical.)
 
 There is **no separate About tab** - Home *is* the about/landing (the old `/about/`
-page was merged in). Don't re-add it.
+page was merged in). Don't re-add it. **`Me` is not an About tab** - it's the
+off-the-clock/personal-taste catch-all (film, music, values, misc), *not* a bio or
+résumé. Home stays the identity/landing; Experience stays the résumé. This is the one
+deliberate exception to "keep the nav lean" - don't grow the nav further without
+re-justifying it here.
 
 ## Home (`index.html`) — the landing / about
 
@@ -73,9 +77,28 @@ behavior and `docs/04-authoring.md` for the frontmatter schema.
 Travel photos live in whichever Photography folder fits the trip (there is no
 separate Travel tab); travel *writing* is just Blog posts tagged `travel`.
 
+## Me (`me.html`)
+
+The off-the-clock / "who I actually am" page - the human behind the firmware. A
+playful catch-all, not a résumé. Structure: a watercolor **bento** — every facet of
+my life is a tile, all visible at once, with varied (masonry) heights and a wash
+that blooms on hover. Current tiles: **On repeat** (Spotify embed, the wide bar up
+top), **Watching** (live Letterboxd diary + optional favourite-films grid), **Small
+joys** (a warm little list), **a few things I care about** (the short creed), and one
+small tile per **odds & ends** link. Tile row-spans are computed from content height
+by a small script so nothing scrolls or leaves a gap. Adding a facet = one more
+`.btile` in `me.html`, fed from `_data/content.yml → me`. Only add a facet whose service has a *real* static-safe
+embed/feed (official iframe, RSS, or a third-party embed that injects into our DOM);
+skip sealed apps with no public surface (e.g. Beli). Candidates that qualify:
+Backloggd (games, RSS), StoryGraph/Goodreads (books, RSS), Strava (official embeds),
+Are.na (open API/JSON), YouTube/Bandcamp (official iframes). Everything is
+data-driven — see `docs/04-authoring.md`. Keep it personal and light; deeper
+skills/roles belong on Experience, the bio on Home.
+
 ## Resources (`resources.html`)
 
-Curated link cards - tools, gear, and referral links. Public-facing list only; the *strategy* behind it stays in the gitignored `STRATEGY.local.md`, never here.
+Curated link cards - tools, gear, and referral links. Public-facing list only; the *strategy* behind it stays in the gitignored `STRATEGY.local.md`, never here. Kept
+distinct from **Me**: Resources is the useful/technical toolbox, Me is personal taste.
 
 ## About → merged into Home
 

@@ -24,7 +24,7 @@ lives in one readable file: **`_data/content.yml`**, exposed to templates as
 `.html` files pull from it and never hardcode this copy anymore.
 
 - Keyed by page: `home`, `blog`, `projects`, `experiences`, `photography`, `art`,
-  `resources`. `meta:` on each is the search / link-preview description.
+  `me`, `resources`. `meta:` on each is the search / link-preview description.
 - The pages read it via `{% raw %}{% assign copy = site.data.content.<page> %}{% endraw %}`;
   `seo.html` looks up the meta by `page.nav`; `gallery.html` looks it up by `page.bucket`.
   A page's own front-matter `description:` still wins if set, so per-post overrides work.
@@ -34,6 +34,31 @@ lives in one readable file: **`_data/content.yml`**, exposed to templates as
 
 (The old `COPY-REVIEW.md` and `CONTENT.md` worksheets drove nothing and were deleted
 when this became the source of truth.)
+
+### Updating the Me page
+
+The whole `/me/` page is edited under `_data/content.yml → me` — no HTML to touch.
+Each block below becomes a **tile** in the bento (order = the order below); tiles
+size themselves to their content, so partial fills always look fine:
+- `stand_for:` — short creed lines (one per bullet; each gets a wash dot), with
+  `stand_for_lead` as the little lowercase label above them. → the **things I care
+  about** tile. Empty the list to drop it.
+- `spotify:` — set `type` (`playlist`/`artist`/`album`) and `id` (the bit after
+  `/playlist/` etc. in a Spotify "Share → Copy link", before the `?`). Optional
+  `label` and `profile` URL. → the wide **On repeat** tile.
+- `letterboxd:` — your `username` (powers the profile link + the live diary embed
+  when `embed: true`) and an optional hand-picked `films` list: `{ title, year,
+  image, url }`. Drop posters in `assets/images/me/` (each `image` gets alt text
+  automatically from its title). → the **Watching** tile.
+- `joys:` — a short list of little things you love (one per bullet). → the **Small
+  joys** tile. Empty it to drop the tile.
+- `links:` — misc `{ title, url, note }` entries; **each becomes its own small
+  tile**. Leave as `[]` to add none.
+
+Each block only renders when it has content, and the bento reflows to however many
+tiles are present. **Adding a new facet** (e.g. Backloggd/StoryGraph): add its data
+here plus one `.btile` in `me.html` (`btile--wide` if you want it full-width); the
+script computes its height automatically.
 
 ## Editor & tools
 

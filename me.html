@@ -1,0 +1,241 @@
+---
+layout: default
+nav: me
+title: More about me
+# All editorial copy + the film/music/joys lists live in _data/content.yml → me
+permalink: /me/
+---
+{%- comment -%}
+  The "Me" page — off-the-clock / who I actually am. A watercolor BENTO: every
+  facet of my life is a tile, all visible at once, varied heights (masonry), each
+  blooming its own wash on hover. Tiles: On repeat (Spotify), Watching (Letterboxd),
+  Small joys, what I care about, and any odds & ends links. Everything is data-driven
+  from _data/content.yml → me, and scoped under .me-page so nothing leaks.
+  (see docs/02-tabs, docs/03-user-interface)
+{%- endcomment -%}
+{%- assign copy = site.data.content.me -%}
+{% include masthead.html title="More about me" %}
+
+<div class="container me-page" data-reveal>
+  <section class="bento" data-bento>
+
+    {%- comment -%} ---- On repeat (Spotify) — wide bar across the top ---- {%- endcomment -%}
+    {% if copy.spotify.id and copy.spotify.id != "" %}
+    <article class="btile btile--wide" style="--w: var(--sage)">
+      <div class="btile__pad">
+        <h3 class="btile__title">{{ copy.spotify.label | default: "On repeat" }}</h3>
+        <div class="spotify-wrap">
+          <iframe
+            title="What I'm listening to on Spotify"
+            src="https://open.spotify.com/embed/{{ copy.spotify.type | default: 'playlist' }}/{{ copy.spotify.id }}?utm_source=generator&theme=0"
+            width="100%" height="352" frameborder="0" loading="lazy"
+            allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+            allowfullscreen></iframe>
+        </div>
+        {% if copy.spotify.profile and copy.spotify.profile != "" %}
+        <p class="btile__more"><a href="{{ copy.spotify.profile }}" rel="me noopener" target="_blank">My full Spotify →</a></p>
+        {% endif %}
+      </div>
+    </article>
+    {% endif %}
+
+    {%- comment -%} ---- Watching (Letterboxd) ---- {%- endcomment -%}
+    {% if copy.letterboxd.username and copy.letterboxd.username != "" %}
+    {%- assign lb = "https://letterboxd.com/" | append: copy.letterboxd.username | append: "/" -%}
+    <article class="btile btile--wide" style="--w: var(--peach)">
+      <div class="btile__pad">
+        <h3 class="btile__title">Recently watched</h3>
+        {% if copy.letterboxd.embed %}
+        {%- comment -%}
+          live diary via a third-party embed service (bokonon). The fetch injects
+          the diary HTML into our own DOM so it inherits our theme. If it can't
+          load, the profile link below still works. (see docs/02-tabs — trial toggle)
+        {%- endcomment -%}
+        <div id="letterboxd-embed-wrapper-tc" class="lb-diary">Loading recent films…</div>
+        <script>
+          fetch('https://lb-embed-content.bokonon.dev?username={{ copy.letterboxd.username }}')
+            .then(function (r) { return r.text(); })
+            .then(function (html) {
+              var el = document.getElementById('letterboxd-embed-wrapper-tc');
+              if (el) { el.innerHTML = html; }
+            })
+            .catch(function () {
+              var el = document.getElementById('letterboxd-embed-wrapper-tc');
+              if (el) { el.textContent = ''; }
+            });
+        </script>
+        {% endif %}
+        {% assign films = copy.letterboxd.films | where_exp: "f", "f.title" %}
+        {% if films.size > 0 %}
+        <div class="film-grid">
+          {% for f in films %}
+          <a class="film" href="{{ f.url | default: lb }}" rel="noopener" target="_blank">
+            <span class="film__poster">
+              {% if f.image %}<img src="{{ f.image | relative_url }}" alt="{{ f.title }}{% if f.year %} ({{ f.year }}){% endif %} poster" loading="lazy" />
+              {% else %}<span class="film__fallback">{{ f.title }}</span>{% endif %}
+            </span>
+            <span class="film__title">{{ f.title }}{% if f.year %} <em>{{ f.year }}</em>{% endif %}</span>
+          </a>
+          {% endfor %}
+        </div>
+        {% endif %}
+        <p class="btile__more"><a href="{{ lb }}" rel="me noopener" target="_blank">Everything I watch →</a></p>
+      </div>
+    </article>
+    {% endif %}
+
+    {%- comment -%} ---- Odds & ends — each misc link is its own small tile ---- {%- endcomment -%}
+    {% assign links = copy.links | where_exp: "l", "l.title" %}
+    {%- assign link_washes = "sky,gold,teal,tomato,lav" | split: "," -%}
+    {% for l in links %}
+    <article class="btile btile--link" style="--w: var(--{{ link_washes[forloop.index0] | default: 'sky' }})">
+      <a class="btile__pad btile__link" href="{{ l.url }}" rel="noopener" target="_blank">
+        <h3 class="btile__title">{{ l.title }}</h3>
+        {% if l.note %}<p class="btile__note">{{ l.note }}</p>{% endif %}
+        <span class="btile__arrow">→</span>
+      </a>
+    </article>
+    {% endfor %}
+
+  </section>
+</div>
+
+<style>
+  /* scoped to .me-page — never leaks to other pages */
+  .me-page{max-width:1240px;padding-bottom:3.5rem}
+
+  /* ---- the bento ----
+     a masonry grid: 4 base columns, tiles span 2 (half) by default, the Spotify
+     bar spans all 4. Each tile's row-span is computed from its content height by
+     the script below, so heights vary but nothing ever leaves a gap or scrolls. */
+  .bento{display:grid;grid-template-columns:repeat(4,1fr);gap:1.15rem;
+    grid-auto-rows:8px;grid-auto-flow:row dense;align-items:start;margin-top:1rem}
+
+  .btile{grid-column:span 2;position:relative;border-radius:24px;overflow:hidden;
+    background:var(--bg-elev);border:1px solid var(--border);
+    box-shadow:0 14px 34px rgba(60,45,35,.10);
+    transition:transform .3s cubic-bezier(.2,.75,.2,1),box-shadow .3s ease}
+  html[data-theme="dark"] .btile{box-shadow:0 14px 34px rgba(0,0,0,.4)}
+  .btile--wide{grid-column:span 4}
+
+  /* one hover = one gesture: lift + a single wet wash bloom from the corner */
+  .btile::before{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+    background:radial-gradient(130% 95% at 0% 0%,color-mix(in srgb,var(--w) 22%,transparent),transparent 60%);
+    opacity:0;transition:opacity .45s ease;z-index:0}
+  .btile:hover{transform:translateY(-5px);
+    box-shadow:0 22px 48px rgba(60,45,35,.16),inset 4px 0 0 color-mix(in srgb,var(--w) 60%,transparent)}
+  html[data-theme="dark"] .btile:hover{
+    box-shadow:0 22px 48px rgba(0,0,0,.5),inset 4px 0 0 color-mix(in srgb,var(--w) 52%,transparent)}
+  .btile:hover::before{opacity:1}
+  @media (prefers-reduced-motion:reduce){.btile{transition:none}}
+
+  .btile__pad{position:relative;z-index:1;display:block;padding:1.6rem 1.6rem 1.5rem}
+  .btile__title{font-family:var(--font-display);font-weight:400;
+    font-size:clamp(1.25rem,3vw,1.6rem);letter-spacing:-.01em;color:var(--text);margin:0 0 1rem}
+  .btile__more{margin:1rem 0 0}
+  .btile__more a{font-family:var(--font-mono);font-size:.8rem;color:var(--accent);text-decoration:none}
+  .btile__more a:hover{text-decoration:underline}
+
+  /* spotify embed framing */
+  .spotify-wrap{border-radius:14px;overflow:hidden;box-shadow:0 8px 22px rgba(60,45,35,.12)}
+  .spotify-wrap iframe{display:block;border:0}
+  html[data-theme="dark"] .spotify-wrap{box-shadow:0 8px 22px rgba(0,0,0,.35)}
+
+  /* live Letterboxd diary embed (third-party HTML injected into our DOM).
+     The service ships its own markup + a vertical flex list; we re-lay it out
+     as a horizontal poster shelf so this tile stays short + wide (matching the
+     Spotify bar) instead of a tall skinny column, and re-token its hardcoded
+     grays so it survives dark mode. Selectors are prefixed with .lb-diary to
+     out-specify the embed's own single-class rules. */
+  .lb-diary{color:var(--text-dim);font-family:var(--font-mono);font-size:.8rem}
+  .lb-diary a{color:var(--accent);text-decoration:none}
+  .lb-diary a:hover{text-decoration:underline}
+  /* container: was a vertical flex column → wrapping horizontal shelf */
+  .lb-diary #letterboxd-embed-tc{flex-direction:row;flex-wrap:wrap;gap:1.1rem 1rem;font-size:.8rem}
+  .lb-diary .letterboxd-embed-tc-diary-entry{padding:0;width:92px;gap:.45rem}
+  .lb-diary .letterboxd-embed-tc-content{flex-direction:column;gap:.45rem}
+  .lb-diary .letterboxd-embed-tc-divider{display:none}
+  .lb-diary .letterboxd-embed-tc-poster img{width:92px;max-width:92px;height:auto;
+    border-radius:8px;box-shadow:0 4px 12px rgba(60,45,35,.14)}
+  .lb-diary .letterboxd-embed-tc-title{font-size:.82rem;font-weight:600;line-height:1.25;
+    color:var(--text);margin:0}
+  .lb-diary .letterboxd-embed-tc-year{font-size:.7rem;color:var(--text-dim);margin:0}
+  .lb-diary .letterboxd-embed-tc-rating{font-size:.9rem;color:var(--accent)}
+  .lb-diary .letterboxd-embed-tc-date,
+  .lb-diary .letterboxd-embed-tc-review,
+  .lb-diary .letterboxd-embed-tc-footer{display:none}
+  html[data-theme="dark"] .lb-diary .letterboxd-embed-tc-poster img{box-shadow:0 4px 12px rgba(0,0,0,.4)}
+
+  /* film poster grid (Letterboxd favourites, if any are curated) */
+  .film-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:.7rem;margin-top:.5rem}
+  .film{text-decoration:none;display:flex;flex-direction:column;gap:.4rem;transition:transform .18s ease}
+  .film:hover{transform:translateY(-3px)}
+  .film__poster{position:relative;aspect-ratio:2/3;border-radius:10px;overflow:hidden;
+    background:var(--bg);border:1px solid var(--border);display:grid;place-items:center}
+  .film__poster img{width:100%;height:100%;object-fit:cover;display:block}
+  .film__fallback{font-family:var(--font-mono);font-size:.72rem;color:var(--text-dim);text-align:center;padding:.5rem}
+  .film__title{font-size:.8rem;color:var(--text);line-height:1.3}
+  .film__title em{font-style:normal;color:var(--text-dim);font-size:.74rem}
+
+  /* odds & ends link tiles */
+  .btile__link{text-decoration:none;min-height:100%}
+  .btile__link .btile__title{margin:0}
+  .btile__note{margin:.4rem 0 0;color:var(--text-dim);font-size:.9rem;line-height:1.45}
+  .btile__arrow{display:inline-block;margin-top:.9rem;font-family:var(--font-mono);
+    color:var(--accent);transition:transform .2s ease}
+  .btile--link:hover .btile__arrow{transform:translateX(4px)}
+
+  @media (max-width:760px){
+    .bento{grid-template-columns:1fr}
+    .btile,.btile--wide{grid-column:1/-1}
+    .btile__pad{padding:1.4rem}
+    .film-grid{grid-template-columns:repeat(auto-fill,minmax(84px,1fr))}
+  }
+</style>
+
+<script>
+  /* Masonry bento: each tile's grid row-span is computed from its content height,
+     so tiles of different heights pack tight with no gaps and no inner scroll.
+     Recomputes on resize and whenever a tile's content changes (Letterboxd injects
+     late, posters load) via a ResizeObserver. Scoped by [data-bento]. */
+  (function () {
+    var bento = document.querySelector('[data-bento]');
+    if (!bento) return;
+    var tiles = Array.prototype.slice.call(bento.querySelectorAll('.btile'));
+    if (!tiles.length) return;
+
+    function rowUnit() {
+      var s = getComputedStyle(bento);
+      return {
+        row: parseFloat(s.gridAutoRows) || 8,
+        gap: parseFloat(s.rowGap) || 18
+      };
+    }
+    function fit(tile) {
+      var pad = tile.querySelector('.btile__pad');
+      if (!pad) return;
+      var u = rowUnit();
+      // +2 for the tile's 1px top/bottom border
+      var h = pad.getBoundingClientRect().height + 2;
+      var span = Math.ceil((h + u.gap) / (u.row + u.gap));
+      tile.style.gridRowEnd = 'span ' + span;
+    }
+    function fitAll() { tiles.forEach(fit); }
+
+    if (window.ResizeObserver) {
+      var ro = new ResizeObserver(function (entries) {
+        entries.forEach(function (e) {
+          var tile = e.target.closest('.btile');
+          if (tile) fit(tile);
+        });
+      });
+      tiles.forEach(function (t) {
+        var pad = t.querySelector('.btile__pad');
+        if (pad) ro.observe(pad);
+      });
+    }
+    window.addEventListener('resize', fitAll);
+    window.addEventListener('load', fitAll);
+    fitAll();
+  })();
+</script>

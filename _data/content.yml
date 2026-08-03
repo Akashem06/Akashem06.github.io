@@ -32,6 +32,7 @@ home:
     - { label: "Art",         sub: "my studies",         url: "/art/",         type: "art",        wash: "peach" }
     - { label: "Projects",    sub: "firmware & systems", url: "/projects/",    type: "project",    wash: "sage"  }
     - { label: "Experience",  sub: "the résumé",         url: "/experiences/", type: "experience", wash: "gold"  }
+    - { label: "Me",          sub: "off the clock",      url: "/me/",          type: "me",         wash: "lilac" }
 
 blog:
   lede:  "Notes on embedded systems, finance, and life abroad. The technical and the personal, side by side."
@@ -65,3 +66,42 @@ resources:
   lede:  "Tools, references, and links I keep coming back to."
   empty: "Resource list coming soon."
   meta:  "Tools, references, and links I recommend for embedded engineering, photography, and travel."
+
+# ---------------------------------------------------------------------
+#  ME  ·  the off-the-clock / "who I actually am" page  (/me/)
+#  Everything on that page is edited here — no HTML to touch.
+# ---------------------------------------------------------------------
+me:
+  meta:  "Films I love (Letterboxd), music on repeat (Spotify)"
+
+  # ---- On repeat (Spotify) -----------------------------------------
+  # Paste the Spotify URI id of a playlist/album/artist. Get it from the
+  # track/playlist "Share → Copy link"; the id is the bit after /playlist/
+  # (or /artist/, /album/) and before the "?". `type` is playlist|artist|album.
+  spotify:
+    type: "playlist"
+    id:   "44zLTa1nXiRS2zHCimGDXJ"   # TODO: swap for your own playlist/artist id
+    label: "My goto playlist"
+    profile: "https://open.spotify.com/user/qxbgjzwml4blsvbxx9fm9xf3e"
+
+  # ---- Watching (Letterboxd) ---------------------------------------
+  # username powers the profile link. `films` is a hand-picked favourites
+  # grid — drop posters in assets/images/me/ and reference them here.
+  letterboxd:
+    username: "aryan06_ibk"
+    # Live diary embed via timcieplowski's free Letterboxd embed service
+    # (third-party, not official — https://letterboxd-embed.timcieplowski.com).
+    # Set embed: true to show your real recent diary entries in an iframe.
+    # Trial only — if the service ever breaks, set this back to false and the
+    # page falls back to the profile link + hand-picked `films` grid below.
+    embed: true
+    embed_height: 620
+    films:
+      # - { title: "Perfect Days", year: 2023, image: "/assets/images/me/perfect-days.jpg", url: "https://letterboxd.com/film/perfect-days/" }
+      []
+
+  # ---- Odds & ends -------------------------------------------------
+  # Misc personal links. Same shape as resources cards (title/url/note).
+  links:
+    # - { title: "My Letterboxd", url: "https://letterboxd.com/your-letterboxd/", note: "everything I watch" }
+    []
