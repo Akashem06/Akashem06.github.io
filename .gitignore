@@ -25,6 +25,11 @@ __pycache__/
 .venv/
 tools/.venv/
 
+# Build-time GitHub data (fetched fresh each build by script/fetch_github.rb).
+# Not source — never commit it, so a stale snapshot can't ship. Run the script
+# locally with a GH_PAT to preview the /projects/ panel.
+_data/github.json
+
 # Env / secrets
 .env
 .env.*

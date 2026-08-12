@@ -1,0 +1,65 @@
+{%- comment -%}
+  GitHub panel for /projects/ — a self-hosted contribution heatmap + the repos
+  Aryan pins on his profile. Data is fetched at BUILD time into _data/github.json
+  by script/fetch_github.rb (public fields only — no private data). The whole block
+  is gated on site.data.github, so local builds (or a skipped fetch) render nothing
+  rather than an empty shell. Palette + #bleed language per docs/01-visual.
+{%- endcomment -%}
+{%- assign gh = site.data.github -%}
+{%- if gh -%}
+<section class="gh" data-reveal aria-labelledby="gh-title">
+  <div class="gh__head">
+    <h2 class="gh__title" id="gh-title">On GitHub</h2>
+    <a class="gh__handle" href="{{ gh.profile_url }}" rel="me noopener" target="_blank">@{{ gh.login }} ↗</a>
+  </div>
+
+  {%- if gh.weeks and gh.weeks.size > 0 -%}
+  <figure class="gh__cal">
+    <div class="heatmap" role="img"
+         aria-label="{{ gh.total_contributions }} contributions in the last year">
+      {%- for week in gh.weeks -%}
+      <div class="heatmap__week">
+        {%- for day in week.days -%}
+        <span class="heatmap__day" data-level="{{ day.level }}"
+              title="{{ day.count }} on {{ day.date }}"></span>
+        {%- endfor -%}
+      </div>
+      {%- endfor -%}
+    </div>
+    <figcaption class="gh__legend">
+      <span>{{ gh.total_contributions }} contributions this year</span>
+      <span class="gh__scale" aria-hidden="true">
+        Less
+        <i class="heatmap__day" data-level="0"></i>
+        <i class="heatmap__day" data-level="1"></i>
+        <i class="heatmap__day" data-level="2"></i>
+        <i class="heatmap__day" data-level="3"></i>
+        <i class="heatmap__day" data-level="4"></i>
+        More
+      </span>
+    </figcaption>
+  </figure>
+  {%- endif -%}
+
+  {%- if gh.pinned and gh.pinned.size > 0 -%}
+  <h3 class="gh__subhead">Pinned repositories</h3>
+  <div class="pcards g2">
+    {%- for repo in gh.pinned -%}
+    <a class="pcard pcard--repo" href="{{ repo.url }}" rel="noopener" target="_blank">
+      <div class="pcard__body">
+        <h3 class="pcard__title">{{ repo.name }}</h3>
+        {%- if repo.desc %}<p class="pcard__sub">{{ repo.desc }}</p>{% endif -%}
+        <p class="repo__meta">
+          {%- if repo.lang -%}
+          <span class="repo__lang"><i class="repo__dot" style="background:{{ repo.color | default: '#888' }}"></i>{{ repo.lang }}</span>
+          {%- endif -%}
+          {%- if repo.stars > 0 %}<span class="repo__stat">★ {{ repo.stars }}</span>{% endif -%}
+          {%- if repo.forks > 0 %}<span class="repo__stat">⑂ {{ repo.forks }}</span>{% endif -%}
+        </p>
+      </div>
+    </a>
+    {%- endfor -%}
+  </div>
+  {%- endif -%}
+</section>
+{%- endif -%}

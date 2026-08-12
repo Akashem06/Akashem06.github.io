@@ -4,6 +4,11 @@ on:
     branches: [main]
   pull_request:
     branches: [main]
+  # Daily rebuild so the GitHub contribution heatmap / pinned repos stay fresh
+  # even with no content push. Manual trigger available too.
+  schedule:
+    - cron: "17 6 * * *"
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -23,6 +28,13 @@ jobs:
         with:
           ruby-version: "3.3"
           bundler-cache: true
+      - name: Fetch public GitHub data (heatmap + pinned repos)
+        run: ruby script/fetch_github.rb
+        env:
+          # Actions' built-in token works for public GraphQL fields. Set a GH_PAT
+          # secret (classic, read:user) if the contribution calendar comes back empty.
+          GH_PAT: ${{ secrets.GH_PAT }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Build site
         run: bundle exec jekyll build
         env:
@@ -53,6 +65,13 @@ jobs:
         with:
           ruby-version: "3.3"
           bundler-cache: true
+      - name: Fetch public GitHub data (heatmap + pinned repos)
+        run: ruby script/fetch_github.rb
+        env:
+          # Actions' built-in token works for public GraphQL fields. Set a GH_PAT
+          # secret (classic, read:user) if the contribution calendar comes back empty.
+          GH_PAT: ${{ secrets.GH_PAT }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Build site
         run: bundle exec jekyll build
         env:

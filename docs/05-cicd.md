@@ -92,6 +92,30 @@ jobs:
 
 > Note: this uses the **Actions-based** Pages deploy (set Pages source to "GitHub Actions" in repo settings). That's what lets the validate-then-deploy gate work. The default "deploy from branch" mode skips your CI gate.
 
+## Build-time data — GitHub panel (heatmap + pinned repos)
+
+The `/projects/` page shows a contribution heatmap and the repos Aryan pins on his
+profile. Both are **fetched at build time**, never client-side:
+
+- `script/fetch_github.rb` runs a single GitHub **GraphQL** query (pinned repos and
+  the contribution calendar are *only* exposed via GraphQL, not REST) and writes
+  `_data/github.json`. `_includes/github-panel.html` reads it; `assets/css/main.css`
+  re-skins the heatmap into the site's teal wash.
+- **Only public fields are requested**, so no private repo or private-commit data can
+  ever appear — even though the token could see more.
+- The step runs before `jekyll build` in **both** CI jobs, with
+  `GITHUB_TOKEN` (Actions' built-in token — no secret to create). If the contribution
+  calendar comes back empty, add a **`GH_PAT`** repo secret (a classic PAT with
+  `read:user`); the script prefers it when present.
+- **Non-fatal by design:** any failure (no token, rate limit, network) prints a
+  warning and exits 0. The include is gated on `site.data.github`, so a skipped fetch
+  just omits the panel — it never breaks a deploy.
+- `_data/github.json` is **gitignored** (build output, not source) so a stale snapshot
+  can't ship. A **daily `schedule:` cron** rebuilds the site so the heatmap stays
+  current with no content push.
+- **Preview locally:** `GH_PAT=<token> ruby script/fetch_github.rb` then
+  `bundle exec jekyll serve`.
+
 ## Frontmatter checker (sketch)
 
 `script/check_frontmatter.rb` should:
