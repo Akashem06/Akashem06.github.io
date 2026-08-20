@@ -20,7 +20,7 @@ permalink: /blog/
     {% for post in site.posts %}
     {%- assign hue = forloop.index | modulo: 8 | plus: 1 -%}
     <a class="pcard" href="{{ post.url | relative_url }}">
-      <span class="pcard__cover ph--{{ hue }}" aria-hidden="true">{% if post.image %}<img src="{{ post.image | relative_url }}" alt="" loading="lazy" />{% endif %}</span>
+      <span class="pcard__cover ph--{{ hue }}" aria-hidden="true">{% if post.image %}<img src="{{ post.image | relative_url }}" alt="" loading="lazy" decoding="async" />{% endif %}</span>
       <div class="pcard__body">
         {% if post.categories %}<span class="pcard__chip">{{ post.categories | first }}</span>{% endif %}
         <h3 class="pcard__title">{{ post.title }}</h3>

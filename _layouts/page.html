@@ -46,7 +46,7 @@ layout: default
         data-caption="{{ page.title }}"
         aria-label="View image: {{ shot.alt | escape }}">
         <img src="{{ shot.thumb | default: shot.image | relative_url }}"
-          alt="{{ shot.alt }}" loading="lazy" />
+          alt="{{ shot.alt }}" loading="lazy" decoding="async" />
       </a>
       {% endfor %}
     </div>

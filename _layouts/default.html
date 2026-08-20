@@ -59,7 +59,7 @@
     <link rel="icon" href="{{ '/assets/favicon.svg' | relative_url }}" type="image/svg+xml" />
     {% feed_meta %}
   </head>
-  <body>
+  <body data-section="{{ page.nav }}">
     <a class="skip-link" href="#main">Skip to content</a>
 
     <!-- Watercolor "bleed" filter (turbulence + displacement) — gives the hero
@@ -75,6 +75,12 @@
       <filter id="wash-bloom">
         <feTurbulence type="fractalNoise" baseFrequency="0.03" numOctaves="2" seed="9" result="n" />
         <feDisplacementMap in="SourceGraphic" in2="n" scale="11" />
+      </filter>
+      <!-- Fine hand-drawn jitter for brushed underlines + deckled rules. High
+           frequency, tiny scale → a pen-wobble along the stroke, not a shred. -->
+      <filter id="brush">
+        <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="1" seed="4" result="n" />
+        <feDisplacementMap in="SourceGraphic" in2="n" scale="2.2" />
       </filter>
     </svg>
 

@@ -22,7 +22,7 @@ permalink: /experiences/
   <ol class="files g2" data-reveal {% if has_shots %}id="gallery"{% endif %}>
     {% for role in roles %}
     <li class="file">
-      {% if role.logo %}<img class="file__logo" src="{{ role.logo | relative_url }}" alt="{{ role.company }} logo" loading="lazy" />{% endif %}
+      {% if role.logo %}<img class="file__logo" src="{{ role.logo | relative_url }}" alt="{{ role.company }} logo" loading="lazy" decoding="async" />{% endif %}
       <div class="file__tag">Record {{ forloop.index | prepend: '0' | slice: -2, 2 }} · {% if role.end_date %}{{ role.type | default: 'Closed' }}{% else %}Active{% endif %}</div>
       <h2 class="file__role">{{ role.title }}</h2>
 
@@ -57,7 +57,7 @@ permalink: /experiences/
           data-caption="{{ role.company }} — {{ role.title }}"
           aria-label="View image: {{ shot.alt | escape }}">
           <img src="{{ shot.thumb | default: shot.image | relative_url }}"
-            alt="{{ shot.alt }}" loading="lazy" />
+            alt="{{ shot.alt }}" loading="lazy" decoding="async" />
         </a>
         {% endfor %}
       </div>

@@ -31,14 +31,14 @@ title: Aryan Kashem
   <div class="collage" id="collage" aria-hidden="true">
     {%- comment -%} projects: cover + any gallery shots (hardware / firmware / screens) {%- endcomment -%}
     {% for pr in projects %}
-      {% if pr.image %}<span class="ctile" data-type="project"><img src="{{ pr.image | relative_url }}" alt="" loading="lazy"/></span>{% endif %}
-      {% for shot in pr.gallery %}<span class="ctile" data-type="project"><img src="{{ shot.thumb | default: shot.image | relative_url }}" alt="" loading="lazy"/></span>{% endfor %}
+      {% if pr.image %}<span class="ctile" data-type="project"><img src="{{ pr.image | replace: '/cover.jpg', '/thumb/cover.jpg' | relative_url }}" alt="" loading="lazy" decoding="async"/></span>{% endif %}
+      {% for shot in pr.gallery %}<span class="ctile" data-type="project"><img src="{{ shot.thumb | default: shot.image | relative_url }}" alt="" loading="lazy" decoding="async"/></span>{% endfor %}
     {% endfor %}
     {%- comment -%} sketches: all of them (small body of work — keep it fully represented) {%- endcomment -%}
-    {% for a in art %}<span class="ctile" data-type="sketch"><img src="{{ a.thumb | default: a.image | relative_url }}" alt="" loading="lazy"/></span>{% endfor %}
+    {% for a in art %}<span class="ctile" data-type="art"><img src="{{ a.thumb | default: a.image | relative_url }}" alt="" loading="lazy" decoding="async"/></span>{% endfor %}
     {%- comment -%} photography: a recent slice so it complements, not dominates {%- endcomment -%}
     {% assign photo_wall = photo | slice: 0, 78 %}
-    {% for p in photo_wall %}<span class="ctile" data-type="photo"><img src="{{ p.thumb | default: p.image | relative_url }}" alt="" loading="lazy"/></span>{% endfor %}
+    {% for p in photo_wall %}<span class="ctile" data-type="photo"><img src="{{ p.thumb | default: p.image | relative_url }}" alt="" loading="lazy" decoding="async"/></span>{% endfor %}
   </div>
 
   {%- comment -%} legibility scrim + a centered multi-colour watercolor bloom {%- endcomment -%}
@@ -117,9 +117,8 @@ title: Aryan Kashem
   .sblob{position:absolute;left:var(--l,50%);top:var(--t,42%);
     width:var(--s,320px);aspect-ratio:1;border-radius:50%;
     background:radial-gradient(circle at 50% 50%,color-mix(in srgb,var(--wash) 92%,transparent),transparent 62%);
-    filter:url(#bleed) blur(5px);opacity:var(--o,.5);will-change:transform;
-    transform:translate(-50%,-50%);
-    animation:bloom var(--dur,18s) ease-in-out var(--delay,0s) infinite}
+    filter:url(#bleed) blur(3px);opacity:var(--o,.5);
+    transform:translate(-50%,-50%)}
   html[data-theme="dark"] .sblob{opacity:.42}
   @keyframes bloom{
     0%,100%{transform:translate(-50%,-50%) scale(1) rotate(0deg)}

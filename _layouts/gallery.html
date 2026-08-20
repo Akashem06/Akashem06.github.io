@@ -62,6 +62,7 @@ layout: default
           src="{{ item.thumb | default: item.image | relative_url }}"
           alt="{{ item.alt }}"
           loading="lazy"
+          decoding="async"
         />
         {% if item.title %}<figcaption class="thumb__caption">{{ item.title }}</figcaption>{% endif %}
       </a>

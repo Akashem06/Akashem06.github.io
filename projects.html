@@ -17,7 +17,7 @@ permalink: /projects/
   <div class="pcards g2" data-reveal>
     {% assign projects = site.projects | sort: "date" | reverse %}
     {% for project in projects %}
-    {%- assign cover = project.image -%}
+    {%- if project.image -%}{%- assign cover = project.image | replace: '/cover.jpg', '/thumb/cover.jpg' -%}{%- endif -%}
     {%- if cover == nil and project.gallery -%}{%- assign cover = project.gallery.first.thumb | default: project.gallery.first.image -%}{%- endif -%}
     {%- if cover -%}
       {%- assign cover_hit = site.static_files | where: "path", cover -%}
@@ -35,7 +35,7 @@ permalink: /projects/
     {%- endif -%}
     {%- assign hue = forloop.index | modulo: 8 | plus: 1 -%}
     <a class="pcard" href="{{ project.url | relative_url }}">
-      <span class="pcard__cover ph--{{ hue }}" aria-hidden="true">{% if cover %}<img src="{{ cover | relative_url }}" alt="" loading="lazy" />{% endif %}</span>
+      <span class="pcard__cover ph--{{ hue }}" aria-hidden="true">{% if cover %}<img src="{{ cover | relative_url }}" alt="" loading="lazy" decoding="async" />{% endif %}</span>
       <div class="pcard__body">
         {% if project.featured %}<span class="pcard__chip">★ Featured</span>{% endif %}
         <h3 class="pcard__title">{{ main_title }}</h3>

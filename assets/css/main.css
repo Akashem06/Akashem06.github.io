@@ -45,11 +45,11 @@
   --accent-hover: var(--plum-deep);
   --accent-text: var(--plum);
   --on-accent: #ffffff;
-  --pop-bg: rgba(106, 77, 136, 0.08); /* tag / badge fill */
+  --pop-bg: color-mix(in srgb, var(--plum) 14%, transparent); /* tag / badge fill — follows the section accent */
   --pop-text: var(--plum); /* tag / badge text */
   --logo-bg: #ffffff; /* company-logo plate — kept white in BOTH themes so dark
                          logos stay legible on the charcoal canvas */
-  --grain-opacity: 0.06; /* faint paper tooth */
+  --grain-opacity: 0.08; /* paper tooth (bumped for a more tactile stock) */
   --grid-line: transparent; /* the hard ministry grid is gone */
   --grid-on-red: rgba(106, 77, 136, 0.08); /* faint plum texture inside header bands */
   --ghost-stroke: rgba(106, 77, 136, 0.18); /* outline of the big ghost numeral */
@@ -81,8 +81,8 @@ html[data-theme="dark"] {
   --line: #3a322a; /* hairlines / rules on charcoal */
 
   --on-accent: #1c1815; /* dark label on the coral button fill (~7:1) */
-  --grain-opacity: 0.05;
-  --pop-bg: rgba(239, 154, 122, 0.16);
+  --grain-opacity: 0.06;
+  --pop-bg: color-mix(in srgb, var(--plum) 20%, transparent);
   --grid-on-red: rgba(239, 154, 122, 0.07);
   --ghost-stroke: rgba(239, 154, 122, 0.2);
   --band-ink: rgba(239, 154, 122, 0.14);
@@ -110,6 +110,30 @@ html[data-theme="dark"] .log {
   background: rgba(40, 34, 27, 0.85);
   box-shadow: 0 18px 44px rgba(0, 0, 0, 0.5), inset 0 0 0 1px var(--line);
 }
+
+/* ---- Per-section pigments (2026 color pass) --------------------------------
+   Each tab paints in its OWN watercolor hue instead of the single plum. We only
+   re-point --plum / --plum-deep on <body data-section>; --accent, --accent-text,
+   --accent-hover and the plum-derived --pop-bg / --grad all read from --plum, so
+   links, the kicker bar, section numerals, buttons, tags, focus and the file /
+   pcard accents recolor with NO markup change. Light uses DEEPER pigments (every
+   one verified AA — small text ≥4.7:1 on the paper); dark reuses the brighter
+   wash constants, which already read on the charcoal. Home + Resources keep the
+   plum/coral default. (Delete this block to go back to one accent.) */
+body[data-section="projects"]    { --plum: #12766c; --plum-deep: #0f6459; } /* teal */
+body[data-section="photography"] { --plum: #226f8d; --plum-deep: #1c5d76; } /* sky */
+body[data-section="experiences"] { --plum: #b8481f; --plum-deep: #9d3c19; } /* terracotta */
+body[data-section="art"]         { --plum: #bb3b68; --plum-deep: #a23057; } /* rose */
+body[data-section="blog"]        { --plum: #8a6011; --plum-deep: #74500e; } /* ochre */
+body[data-section="me"]          { --plum: #6f52a0; --plum-deep: #5a4184; } /* lilac */
+
+html[data-theme="dark"] body[data-section="projects"]    { --plum: var(--teal);  --plum-deep: var(--teal); }
+html[data-theme="dark"] body[data-section="photography"] { --plum: var(--sky);   --plum-deep: var(--sky); }
+html[data-theme="dark"] body[data-section="experiences"] { --plum: var(--peach); --plum-deep: var(--peach); }
+html[data-theme="dark"] body[data-section="art"]         { --plum: var(--rose);  --plum-deep: var(--rose); }
+html[data-theme="dark"] body[data-section="blog"]        { --plum: var(--gold);  --plum-deep: var(--gold); }
+html[data-theme="dark"] body[data-section="me"]          { --plum: var(--lilac); --plum-deep: var(--lilac); }
+
 /* ---- Type / spacing scale -------------------------------------------------- */
 :root {
   /* Watercolor type: Gloock (high-contrast display serif) for headlines over
@@ -880,7 +904,7 @@ html[data-theme="dark"] .mblob { opacity: 0.4; }
   font-size: 0.72rem;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: var(--text-dim);
+  color: var(--accent-text); /* section pigment — a colored kicker over the title */
 }
 .masthead__title {
   position: relative;
@@ -897,8 +921,9 @@ html[data-theme="dark"] .mblob { opacity: 0.4; }
   position: relative;
   z-index: 1;
   border: none;
-  height: 1px;
-  background: var(--border);
+  height: 2px;
+  /* section pigment fading into the hairline — a colored underline under the title */
+  background: linear-gradient(90deg, var(--accent), var(--border) 55%);
   margin: 1.3rem 0 0;
 }
 .masthead__lede {
@@ -2476,6 +2501,85 @@ html[data-theme="dark"] .gallery-toolbar {
 .reveal [data-reveal].is-visible {
   opacity: 1;
   transform: none;
+}
+
+/* ===========================================================================
+   HUMAN PASS (2026) — de-AI polish. Two moves, reversible by deleting the blocks
+   below: (1) the watercolor blooms read as painted BLOTS, not floating glowing
+   orbs; (2) links + rules carry a hand-drawn wobble. (Card grids stay square /
+   properly aligned — the off-true stagger was tried and pulled.)
+   ========================================================================== */
+
+/* (1) PAINT, NOT ORBS ------------------------------------------------------
+   The blooms used to breathe/drift on a loop — a perfect glowing circle that
+   floats = the classic "AI orb". Hold them still and break the circle into an
+   organic, hand-painted blot; the ragged url(#bleed) edge sells the paint. */
+.blob,
+.mblob,
+.sblob,
+.bloom-head__wash i {
+  animation: none !important;
+}
+.mblob:nth-child(3n + 1),
+.sblob:nth-child(3n + 1),
+.blob:nth-child(3n + 1),
+.bloom-head__wash i:nth-child(3n + 1) { border-radius: 47% 53% 58% 42% / 55% 47% 53% 45%; }
+.mblob:nth-child(3n + 2),
+.sblob:nth-child(3n + 2),
+.blob:nth-child(3n + 2),
+.bloom-head__wash i:nth-child(3n + 2) { border-radius: 63% 37% 45% 55% / 42% 61% 39% 58%; }
+.mblob:nth-child(3n),
+.sblob:nth-child(3n),
+.blob:nth-child(3n),
+.bloom-head__wash i:nth-child(3n)     { border-radius: 38% 62% 55% 45% / 60% 40% 58% 42%; }
+
+/* (2a) HAND-DRAWN UNDERLINES — brushed, hand-inked strokes on running-prose
+   links (never nav/cards/buttons). currentColor keeps them on the section accent. */
+.article__body a:not(.btn),
+.page-lede a,
+.masthead__lede a,
+.article__summary a {
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, currentColor 55%, transparent);
+  text-decoration-thickness: 0.14em;
+  text-underline-offset: 0.16em;
+  text-decoration-skip-ink: none;
+}
+.article__body a:not(.btn):hover,
+.page-lede a:hover,
+.masthead__lede a:hover,
+.article__summary a:hover {
+  text-decoration-color: currentColor;
+}
+/* "view all" / section links: a wobbly brushed underline that paints in on hover */
+.sec-head a,
+.section-head a { position: relative; }
+.sec-head a::after,
+.section-head a::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -3px;
+  height: 3px;
+  background: currentColor;
+  border-radius: 3px;
+  filter: url(#brush);
+  opacity: 0.7;
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 0.28s ease;
+}
+.sec-head a:hover::after,
+.section-head a:hover::after { transform: scaleX(1); }
+
+/* (2b) DECKLED RULES — a torn-stock wobble on the thin dividers. */
+hr,
+.masthead__rule { filter: url(#brush); }
+
+@media (prefers-reduced-motion: reduce) {
+  .sec-head a::after,
+  .section-head a::after { transition: none; }
 }
 
 /* ---- Reduced motion -------------------------------------------------------- */
