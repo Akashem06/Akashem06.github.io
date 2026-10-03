@@ -1,0 +1,49 @@
+# Jekyll
+_site/
+.sass-cache/
+.jekyll-cache/
+.jekyll-metadata
+vendor/
+.bundle/
+
+# Local-only planning - never commit
+STRATEGY.local.md
+*.local.md
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+*.swp
+# Ignore local VS Code settings, but keep the shared extension recommendation.
+.vscode/*
+!.vscode/extensions.json
+
+# Python tooling (tools/)
+__pycache__/
+*.pyc
+.venv/
+tools/.venv/
+
+# Build-time GitHub data (fetched fresh each build by script/fetch_github.rb).
+# Not source — never commit it, so a stale snapshot can't ship. Run the script
+# locally with a GH_PAT to preview the /projects/ panel.
+_data/github.json
+
+# Build-time Substack posts (fetched fresh each build by script/fetch_substack.rb).
+# Not source — never commit it. Run locally with SUBSTACK_HANDLE=<handle> to preview.
+_data/substack.json
+
+# Env / secrets
+.env
+.env.*
+
+# Internal: operating docs + authoring tooling live in a private companion repo,
+# not here. They stay on disk (tools/ keeps working, CLAUDE.md keeps auto-loading)
+# but are never tracked or pushed to this public repo. After adding these, run:
+#   git rm -r --cached docs tools CLAUDE.md README.md .frontmatter
+/docs/
+/tools/
+/CLAUDE.md
+/README.md
+/.frontmatter/

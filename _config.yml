@@ -1,0 +1,96 @@
+# Site settings
+title: "Aryan Kashem"
+tagline: "Embedded firmware engineer, photographer, and artist"
+description: >-
+  Personal blog and portfolio of Aryan Kashem
+url: "https://akashem06.github.io"
+baseurl: ""
+lang: en
+author:
+  name: "Aryan Kashem"
+  # github handle is public-safe; other handles are TODO until provided
+  github: "Akashem06"
+
+# Social / contact.
+social:
+  github: "Akashem06"
+  linkedin: "aryan-kashem" # https://www.linkedin.com/in/aryan-kashem/
+  twitter: "aryan_ibk" # https://x.com/aryan_ibk
+contact_user: "akashem"
+contact_domain: "uwaterloo.ca"
+
+# Substack — the ONE handle in https://<handle>.substack.com. Drives the /blog/
+# subscribe embed, the build-time post fetch (script/fetch_substack.rb), and the
+# footer link. Leave empty until the publication exists; everything gates on it,
+# so an empty value simply hides the Substack surfaces (no build error).
+substack: "aryankashem"
+
+# Analytics — GoatCounter (free, cookieless). Set to your site code (the
+# "<code>" in <code>.goatcounter.com). Only injected in production builds
+# (JEKYLL_ENV=production) and only when non-empty, so local traffic isn't counted.
+analytics:
+  goatcounter: "aryan06ibk"
+
+# Default OG/social preview image used when a page/post doesn't set its own.
+default_image: "/assets/images/og-default.png"
+
+# Feature flags — flip a section on/off site-wide without touching its files.
+# `blog: false` hides the Blog nav tab, the home landing door, and the /blog/
+# page contents. The files, permalinks, and any posts stay intact, so setting
+# this back to `true` restores everything exactly as it was.
+features:
+  blog: true
+
+# Build
+markdown: kramdown
+kramdown:
+  syntax_highlighter: rouge
+permalink: /blog/:year/:month/:day/:title/
+timezone: America/Toronto
+
+# Collections
+collections:
+  projects:
+    output: true
+    permalink: /projects/:name/
+  galleries:
+    output: false # gallery items are data, surfaced through gallery.html
+  experiences:
+    output: false # roles are surfaced as a timeline on experiences.html (no per-role pages)
+
+# Front-matter defaults
+defaults:
+  - scope:
+      path: ""
+      type: posts
+    values:
+      layout: post
+  - scope:
+      path: ""
+      type: projects
+    values:
+      layout: page
+
+# Plugins (auto-generate sitemap + RSS)
+plugins:
+  - jekyll-sitemap
+  - jekyll-feed
+
+feed:
+  path: feed.xml
+
+# Excluded from the build output
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - CLAUDE.md
+  - README.md
+  - docs/
+  - script/
+  - tools/
+  - vendor/
+  - "*.local.md"
+  - .github/
+  - frontmatter.json
+  - .frontmatter/
+  - .vscode/

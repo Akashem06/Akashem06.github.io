@@ -1,0 +1,25 @@
+---
+layout: default
+nav: resources
+title: Resources
+# Editorial copy (eyebrow, lede, empty state, meta) lives in _data/content.yml → resources
+permalink: /resources/
+resources: []
+---
+{%- assign copy = site.data.content.resources -%}
+{% include masthead.html title="Resources" eyebrow=copy.eyebrow lede=copy.lede %}
+
+<div class="container">
+  {% if page.resources.size > 0 %}
+  <div class="card-grid" data-reveal>
+    {% for r in page.resources %}
+    <a class="card" href="{{ r.url }}"{% if r.url != "#" %} rel="noopener" target="_blank"{% endif %}>
+      <h2 class="card__title">{{ r.title }}</h2>
+      {% if r.note %}<p class="muted">{{ r.note }}</p>{% endif %}
+    </a>
+    {% endfor %}
+  </div>
+  {% else %}
+  <p class="muted">{{ copy.empty }}</p>
+  {% endif %}
+</div>

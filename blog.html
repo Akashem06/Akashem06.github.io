@@ -1,0 +1,69 @@
+---
+layout: default
+nav: blog
+title: Blog
+# Editorial copy (lede, empty state, meta) lives in _data/content.yml → blog
+permalink: /blog/
+---
+{%- comment -%}
+  Substack-first hub. Writing lives on Substack; this page is a subscribe surface +
+  an auto-updating list of the latest posts. Posts are pulled at BUILD TIME by
+  script/fetch_substack.rb into site.data.substack (mirrors the /projects/ GitHub
+  panel) — never client-side. Everything gates on config/data, so before the handle
+  is set (or before anything is published) the page just shows the subscribe CTA.
+{%- endcomment -%}
+{%- assign copy = site.data.content.blog -%}
+{%- assign sub = site.data.substack -%}
+{%- assign has_posts = false -%}
+{%- if sub and sub.posts and sub.posts.size > 0 -%}{%- assign has_posts = true -%}{%- endif -%}
+{%- if has_posts -%}
+  {%- assign n = sub.posts | size -%}
+  {%- capture eyebrow -%}{{ n }} post{% unless n == 1 %}s{% endunless %} · Substack{%- endcapture -%}
+{%- else -%}
+  {%- assign eyebrow = "Newsletter" -%}
+{%- endif -%}
+{% include masthead.html title="Blog" eyebrow=eyebrow lede=copy.lede wide=true %}
+
+<div class="container-wide">
+  {%- comment -%} Subscribe card — the primary action. Inline email capture via the
+    Substack embed, with a link-out fallback for no-iframe / no-JS. {%- endcomment -%}
+  <section class="subscribe" data-reveal aria-labelledby="subscribe-h">
+    <div class="subscribe__copy">
+      <h2 id="subscribe-h" class="subscribe__title">Subscribe</h2>
+      <p class="subscribe__blurb">{{ copy.subscribe | default: "New writing, in your inbox." }}</p>
+    </div>
+    {% if site.substack and site.substack != "" %}
+    <div class="subscribe__embed">
+      <iframe
+        src="https://{{ site.substack }}.substack.com/embed"
+        title="Subscribe on Substack"
+        width="100%" height="150" frameborder="0" scrolling="no"
+        loading="lazy"></iframe>
+    </div>
+    <a class="btn subscribe__cta" href="https://{{ site.substack }}.substack.com" target="_blank" rel="noopener">Read on Substack&nbsp;↗</a>
+    {% else %}
+    <p class="muted subscribe__soon">Launching soon.</p>
+    {% endif %}
+  </section>
+
+  {% if has_posts %}
+  {%- comment -%} Latest posts, pulled from Substack RSS at build time. Reuses the
+    .pcard grid so it reads as a sibling of the projects list. Links out to Substack. {%- endcomment -%}
+  {% include bloom-head.html title="Latest posts" %}
+  <div class="pcards g2" data-reveal>
+    {% for post in sub.posts %}
+    {%- assign hue = forloop.index | modulo: 8 | plus: 1 -%}
+    <a class="pcard" href="{{ post.url }}" target="_blank" rel="noopener">
+      <span class="pcard__cover ph--{{ hue }}" aria-hidden="true">{% if post.image %}<img src="{{ post.image }}" alt="" loading="lazy" decoding="async" />{% endif %}</span>
+      <div class="pcard__body">
+        <span class="pcard__chip">Substack</span>
+        <h3 class="pcard__title">{{ post.title }}</h3>
+        <p class="pcard__stack">{% if post.date %}{{ post.date | date: "%b %-d, %Y" }} · {% endif %}Substack&nbsp;↗</p>
+      </div>
+    </a>
+    {% endfor %}
+  </div>
+  {% else %}
+  <p class="muted">{{ copy.empty }}</p>
+  {% endif %}
+</div>

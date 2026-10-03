@@ -1,0 +1,122 @@
+{
+  "$schema": "https://frontmatter.codes/frontmatter.schema.json",
+  "frontMatter.framework.id": "jekyll",
+  "frontMatter.preview.host": "http://localhost:4000",
+  "frontMatter.content.defaultFileType": "md",
+  "frontMatter.content.publicFolder": "[[workspace]]",
+  "frontMatter.dashboard.openOnStart": false,
+  "frontMatter.dashboard.content.cardFields": {
+    "title": "title",
+    "date": "date",
+    "image": "image"
+  },
+  "frontMatter.content.pageFolders": [
+    {
+      "title": "Blog posts",
+      "path": "[[workspace]]/_posts",
+      "filePrefix": "yyyy-MM-dd",
+      "contentTypes": ["post"]
+    },
+    {
+      "title": "Projects",
+      "path": "[[workspace]]/_projects",
+      "filePrefix": "",
+      "contentTypes": ["project"]
+    },
+    {
+      "title": "Experience",
+      "path": "[[workspace]]/_experiences",
+      "filePrefix": "",
+      "contentTypes": ["experience"]
+    },
+    {
+      "title": "Gallery",
+      "path": "[[workspace]]/_galleries",
+      "filePrefix": "",
+      "contentTypes": ["gallery"]
+    }
+  ],
+  "frontMatter.taxonomy.contentTypes": [
+    {
+      "name": "post",
+      "pageBundle": false,
+      "fileType": "md",
+      "previewPath": "'/blog'",
+      "fields": [
+        { "title": "Title", "name": "title", "type": "string", "required": true },
+        { "title": "Publish date", "name": "date", "type": "datetime", "required": true, "default": "{{now}}" },
+        { "title": "SEO description", "name": "description", "type": "string", "single": true, "required": true },
+        { "title": "Categories", "name": "categories", "type": "list", "required": true },
+        { "title": "Cover image (OG)", "name": "image", "type": "image" },
+        { "title": "Read time (min)", "name": "read_time", "type": "number" }
+      ]
+    },
+    {
+      "name": "project",
+      "pageBundle": false,
+      "fileType": "md",
+      "previewPath": "'/projects'",
+      "fields": [
+        { "title": "Title", "name": "title", "type": "string", "required": true },
+        { "title": "Summary", "name": "summary", "type": "string", "single": true, "required": true },
+        { "title": "Repository URL", "name": "repo", "type": "string", "single": true },
+        { "title": "Live demo URL", "name": "demo", "type": "string", "single": true },
+        { "title": "Tech stack", "name": "stack", "type": "list" },
+        { "title": "Highlights", "name": "features", "type": "list" },
+        { "title": "Challenges", "name": "challenges", "type": "string" },
+        { "title": "Cover image", "name": "image", "type": "image" },
+        { "title": "Gallery images", "name": "gallery", "type": "block", "fieldGroup": ["galleryItem"] },
+        { "title": "Showcase video (MP4 path)", "name": "video", "type": "file", "single": true },
+        { "title": "Video poster", "name": "video_poster", "type": "image" },
+        { "title": "Featured on home", "name": "featured", "type": "boolean", "default": false },
+        { "title": "Date", "name": "date", "type": "datetime", "default": "{{now}}" }
+      ]
+    },
+    {
+      "name": "experience",
+      "pageBundle": false,
+      "fileType": "md",
+      "previewPath": "'/experiences'",
+      "fields": [
+        { "title": "Company", "name": "company", "type": "string", "single": true, "required": true },
+        { "title": "Position title", "name": "title", "type": "string", "single": true, "required": true },
+        { "title": "Company URL", "name": "company_url", "type": "string", "single": true },
+        { "title": "Logo", "name": "logo", "type": "image", "required": true },
+        { "title": "Location", "name": "location", "type": "string", "single": true },
+        { "title": "Employment type", "name": "type", "type": "choice", "choices": ["Internship", "Co-op", "Full-time", "Part-time", "Contract"] },
+        { "title": "Start date", "name": "start_date", "type": "string", "single": true },
+        { "title": "End date (blank = Present)", "name": "end_date", "type": "string", "single": true },
+        { "title": "Tech / skills", "name": "stack", "type": "list" },
+        { "title": "Highlights (resume bullets)", "name": "highlights", "type": "list" },
+        { "title": "Sort date", "name": "date", "type": "datetime", "default": "{{now}}" },
+        { "title": "Featured", "name": "featured", "type": "boolean", "default": false }
+      ]
+    },
+    {
+      "name": "gallery",
+      "pageBundle": false,
+      "fileType": "md",
+      "fields": [
+        { "title": "Type", "name": "type", "type": "choice", "choices": ["photography", "sketches", "travel"], "default": "travel", "required": true },
+        { "title": "Title / caption", "name": "title", "type": "string", "single": true },
+        { "title": "Full image", "name": "image", "type": "image", "required": true },
+        { "title": "Thumbnail", "name": "thumb", "type": "image" },
+        { "title": "Alt text (required)", "name": "alt", "type": "string", "single": true, "required": true },
+        { "title": "Location", "name": "location", "type": "string", "single": true },
+        { "title": "Date", "name": "date", "type": "datetime", "default": "{{now}}" },
+        { "title": "Featured", "name": "featured", "type": "boolean", "default": false }
+      ]
+    }
+  ],
+  "frontMatter.taxonomy.fieldGroups": [
+    {
+      "id": "galleryItem",
+      "labelField": "alt",
+      "fields": [
+        { "title": "Full image", "name": "image", "type": "image", "required": true },
+        { "title": "Thumbnail", "name": "thumb", "type": "image" },
+        { "title": "Alt text (required)", "name": "alt", "type": "string", "single": true, "required": true }
+      ]
+    }
+  ]
+}

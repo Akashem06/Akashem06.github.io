@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" role="img" aria-label="Placeholder company logo">
+  <rect width="200" height="200" rx="24" fill="#161b22"/>
+  <rect x="1" y="1" width="198" height="198" rx="23" fill="none" stroke="#30363d" stroke-width="2"/>
+  <text x="100" y="118" fill="#b9a8ff" font-family="system-ui, sans-serif" font-size="72" font-weight="700" text-anchor="middle">Co</text>
+</svg>
