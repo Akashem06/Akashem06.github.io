@@ -61,18 +61,29 @@ def first_img(html)
   m && m[1]
 end
 
-# Substack sits behind Cloudflare, which 403s obvious bot User-Agents and
-# datacenter IPs (e.g. GitHub Actions runners). Sending a real browser UA +
-# the Accept headers a browser sends gets the RSS feed through; a couple of
-# retries with backoff rides out transient edge hiccups. Works locally too.
+# Substack sits behind Cloudflare, which 403s datacenter IPs outright (GitHub
+# Actions runners) regardless of User-Agent. So we try the feed directly first
+# (works locally / anywhere not blocked), then fall back to a public read-proxy
+# that fetches it from an allowed IP and echoes the raw body. A browser UA +
+# browser Accept headers + a few retries ride out the rest.
 BROWSER_UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 " \
              "(KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36"
 
-def fetch_feed(uri)
+FEED_PATH = "https://#{handle}.substack.com/feed"
+
+# Sources tried in order. Each entry is [label, url]; the first that returns a
+# body containing an <item> wins. The proxy bypasses Cloudflare's IP block.
+SOURCES = [
+  ["direct",     FEED_PATH],
+  ["allorigins", "https://api.allorigins.win/raw?url=#{CGI.escape(FEED_PATH)}"]
+].freeze
+
+def http_get(url)
+  uri = URI(url)
   http = Net::HTTP.new(uri.host, uri.port)
-  http.use_ssl = true
+  http.use_ssl = (uri.scheme == "https")
   http.open_timeout = 15
-  http.read_timeout = 20
+  http.read_timeout = 30
   req = Net::HTTP::Get.new(uri)
   req["User-Agent"] = BROWSER_UA
   req["Accept"] = "application/rss+xml, application/xml, text/xml, */*;q=0.1"
@@ -80,24 +91,35 @@ def fetch_feed(uri)
   http.request(req)
 end
 
-begin
-  uri = URI("https://#{handle}.substack.com/feed")
-
-  res = nil
+# Try one source up to 3 times; return its body on success, else nil.
+def try_source(label, url)
   attempts = 0
   begin
     attempts += 1
-    res = fetch_feed(uri)
+    res = http_get(url)
     raise "HTTP #{res.code}" unless res.is_a?(Net::HTTPSuccess)
+    raise "no <item> in body" unless res.body&.include?("<item")
+    warn "[fetch_substack] fetched via #{label} (attempt #{attempts})."
+    res.body
   rescue StandardError => e
     if attempts < 3
       sleep(attempts * 2)
       retry
     end
-    warn_skip("#{e.message} from #{uri} after #{attempts} attempt(s)")
+    warn "[fetch_substack] #{label} failed: #{e.message} (#{url})."
+    nil
   end
+end
 
-  doc = REXML::Document.new(res.body)
+begin
+  body = nil
+  SOURCES.each do |label, url|
+    body = try_source(label, url)
+    break if body
+  end
+  warn_skip("all sources failed (direct + proxy) for #{FEED_PATH}") if body.nil?
+
+  doc = REXML::Document.new(body)
   items = REXML::XPath.match(doc, "//item")
   warn_skip("feed has no <item>s yet (nothing published?)") if items.empty?
 
