@@ -61,16 +61,41 @@ def first_img(html)
   m && m[1]
 end
 
-begin
-  uri = URI("https://#{handle}.substack.com/feed")
+# Substack sits behind Cloudflare, which 403s obvious bot User-Agents and
+# datacenter IPs (e.g. GitHub Actions runners). Sending a real browser UA +
+# the Accept headers a browser sends gets the RSS feed through; a couple of
+# retries with backoff rides out transient edge hiccups. Works locally too.
+BROWSER_UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 " \
+             "(KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36"
+
+def fetch_feed(uri)
   http = Net::HTTP.new(uri.host, uri.port)
   http.use_ssl = true
+  http.open_timeout = 15
   http.read_timeout = 20
   req = Net::HTTP::Get.new(uri)
-  req["User-Agent"] = "akashem06.github.io-build"
+  req["User-Agent"] = BROWSER_UA
+  req["Accept"] = "application/rss+xml, application/xml, text/xml, */*;q=0.1"
+  req["Accept-Language"] = "en-US,en;q=0.9"
+  http.request(req)
+end
 
-  res = http.request(req)
-  warn_skip("HTTP #{res.code} from #{uri}") unless res.is_a?(Net::HTTPSuccess)
+begin
+  uri = URI("https://#{handle}.substack.com/feed")
+
+  res = nil
+  attempts = 0
+  begin
+    attempts += 1
+    res = fetch_feed(uri)
+    raise "HTTP #{res.code}" unless res.is_a?(Net::HTTPSuccess)
+  rescue StandardError => e
+    if attempts < 3
+      sleep(attempts * 2)
+      retry
+    end
+    warn_skip("#{e.message} from #{uri} after #{attempts} attempt(s)")
+  end
 
   doc = REXML::Document.new(res.body)
   items = REXML::XPath.match(doc, "//item")
