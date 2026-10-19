@@ -35,6 +35,18 @@ jobs:
           # secret (classic, read:user) if the contribution calendar comes back empty.
           GH_PAT: ${{ secrets.GH_PAT }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # Persist the last successful Substack fetch. Cloudflare 403s runner IPs on the
+      # direct feed, so the build leans on flaky public proxies; when they're all down
+      # the fetch script exits without overwriting _data/substack.json, and this cache
+      # feeds it the previous good posts instead of the empty state. Unique key per run
+      # saves a fresh snapshot each time; restore-keys grabs the most recent prior one.
+      - name: Restore last good Substack data
+        uses: actions/cache@v4
+        with:
+          path: _data/substack.json
+          key: substack-${{ github.run_id }}
+          restore-keys: |
+            substack-
       - name: Fetch Substack posts (public RSS)
         run: ruby script/fetch_substack.rb
       - name: Build site
@@ -73,6 +85,15 @@ jobs:
           # secret (classic, read:user) if the contribution calendar comes back empty.
           GH_PAT: ${{ secrets.GH_PAT }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # See the matching step in the validate job: feeds the last successful Substack
+      # fetch back in so a proxy outage ships stale-but-real posts, not the empty state.
+      - name: Restore last good Substack data
+        uses: actions/cache@v4
+        with:
+          path: _data/substack.json
+          key: substack-${{ github.run_id }}
+          restore-keys: |
+            substack-
       - name: Fetch Substack posts (public RSS)
         run: ruby script/fetch_substack.rb
       - name: Build site

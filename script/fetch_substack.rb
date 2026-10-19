@@ -72,10 +72,16 @@ BROWSER_UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 " \
 FEED_PATH = "https://#{handle}.substack.com/feed"
 
 # Sources tried in order. Each entry is [label, url]; the first that returns a
-# body containing an <item> wins. The proxy bypasses Cloudflare's IP block.
+# body containing an <item> wins. The proxies bypass Cloudflare's IP block by
+# fetching the feed from an allowed IP and echoing the raw body. We list several
+# independent free proxies so one being down (allorigins 522s a lot) doesn't sink
+# the whole build — the fetch only fails if the direct hit AND every proxy fail.
 SOURCES = [
   ["direct",     FEED_PATH],
-  ["allorigins", "https://api.allorigins.win/raw?url=#{CGI.escape(FEED_PATH)}"]
+  ["allorigins", "https://api.allorigins.win/raw?url=#{CGI.escape(FEED_PATH)}"],
+  ["codetabs",   "https://api.codetabs.com/v1/proxy/?quest=#{CGI.escape(FEED_PATH)}"],
+  ["corsproxy",  "https://corsproxy.io/?url=#{CGI.escape(FEED_PATH)}"],
+  ["thingproxy", "https://thingproxy.freeboard.io/fetch/#{FEED_PATH}"]
 ].freeze
 
 def http_get(url)
@@ -117,7 +123,11 @@ begin
     body = try_source(label, url)
     break if body
   end
-  warn_skip("all sources failed (direct + proxy) for #{FEED_PATH}") if body.nil?
+  # Cache-last: on total failure we exit WITHOUT touching _data/substack.json, so
+  # whatever the last successful build wrote (restored from the CI cache — see the
+  # "Restore last good Substack data" step in .github/workflows/ci.yml) still ships.
+  # The blog only falls back to the empty state on a first-ever / cold-cache miss.
+  warn_skip("all sources failed (direct + proxies) for #{FEED_PATH} — keeping last cached posts if any") if body.nil?
 
   doc = REXML::Document.new(body)
   items = REXML::XPath.match(doc, "//item")
