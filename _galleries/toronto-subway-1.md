@@ -3,7 +3,6 @@ bucket: photography
 album: Toronto
 title: Toronto Subway 1
 image: /assets/images/gallery/toronto/torontosubway-1.webp
-thumb: /assets/images/gallery/toronto/thumb/torontosubway-1.webp
 alt: Toronto Streets
 location: Toronto, ON, Canada
 date: '2026-07-14'

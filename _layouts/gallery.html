@@ -48,26 +48,22 @@ layout: default
   <div class="masonry" id="gallery">
     {%- for item in items -%}
     {%- capture search_terms -%}{{ item.title }} {{ item.location }} {{ item.album }} {{ item.alt }}{% if item.featured %} featured{% endif %}{%- endcapture -%}
+    {%- comment -%} Photography is one 700px file (no thumb); Art keeps a small thumb, so
+      the grid still uses thumb-when-present, image otherwise. image_dims stamps
+      width/height (no extra files) so there's no layout shift. {%- endcomment -%}
     {%- assign thumb_src = item.thumb | default: item.image -%}
-    {%- comment -%} Responsive sources, emitted only when the pipeline has built the
-      variants (srcset_with returns "" otherwise, so this is safe pre-regenerate):
-      grid serves the small/thumb pair; the lightbox gets an 800w/full pair. {%- endcomment -%}
-    {%- assign grid_srcset = thumb_src | srcset_with: "@300" -%}
-    {%- assign full_srcset = item.image | srcset_with: "@800" -%}
     <figure class="masonry__item"
       data-album="{{ item.album | slugify }}"
       data-search="{{ search_terms | escape }}">
       <a
         class="thumb"
         href="{{ item.image | relative_url }}"
-        {% if full_srcset != "" %}data-srcset="{{ full_srcset }}" data-sizes="100vw"{% endif %}
         data-caption="{{ item.title }}{% if item.location %} · {{ item.location }}{% endif %}"
         aria-label="View: {{ item.alt | escape }}"
       >
         <img
           src="{{ thumb_src | relative_url }}"
           {{ thumb_src | image_dims }}
-          {% if grid_srcset != "" %}srcset="{{ grid_srcset }}" sizes="(max-width:620px) 45vw, (max-width:1100px) 30vw, 18vw"{% endif %}
           alt="{{ item.alt }}"
           loading="lazy"
           decoding="async"
