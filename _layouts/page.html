@@ -41,11 +41,17 @@ layout: default
   <section class="section" data-reveal aria-label="Project images">
     <div class="project-gallery" id="gallery">
       {% for shot in page.gallery %}
+      {%- assign shot_thumb = shot.thumb | default: shot.image -%}
+      {%- assign shot_grid_srcset = shot_thumb | srcset_with: "@300" -%}
+      {%- assign shot_full_srcset = shot.image | srcset_with: "@800" -%}
       <a class="thumb"
         href="{{ shot.image | relative_url }}"
+        {% if shot_full_srcset != "" %}data-srcset="{{ shot_full_srcset }}" data-sizes="100vw"{% endif %}
         data-caption="{{ page.title }}"
         aria-label="View image: {{ shot.alt | escape }}">
-        <img src="{{ shot.thumb | default: shot.image | relative_url }}"
+        <img src="{{ shot_thumb | relative_url }}"
+          {{ shot_thumb | image_dims }}
+          {% if shot_grid_srcset != "" %}srcset="{{ shot_grid_srcset }}" sizes="(max-width:620px) 90vw, (max-width:1100px) 45vw, 30vw"{% endif %}
           alt="{{ shot.alt }}" loading="lazy" decoding="async" />
       </a>
       {% endfor %}

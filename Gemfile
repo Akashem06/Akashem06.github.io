@@ -20,6 +20,12 @@ group :jekyll_plugins do
   gem "jekyll-feed", "~> 0.17"
 end
 
+# Read image dimensions at build time (header bytes only — no ImageMagick),
+# used by _plugins/image_dims.rb to stamp width/height + responsive srcset.
+# Safe on the Actions builder: CI runs `bundle exec jekyll build`, not Pages'
+# restricted plugin whitelist, so custom _plugins/ + gems load normally.
+gem "fastimage", "~> 2.3"
+
 # CI validation (see docs/05-cicd.md).
 group :test do
   gem "html-proofer", "~> 5.0"

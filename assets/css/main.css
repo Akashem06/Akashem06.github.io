@@ -1965,6 +1965,15 @@ html[data-theme="dark"] .gallery-toolbar {
 .masonry__item.is-hidden {
   display: none;
 }
+/* Windowing: items past the current render window are dropped from layout by
+   gallery.js (keeps the column count cheap at thousands of photos). Distinct
+   from .is-hidden (filtered out) so the lightbox can still walk the full
+   filtered set — it reads each item's <a href>, not the thumbnail. We window in
+   JS rather than `content-visibility:auto` because the latter fights CSS
+   multi-column balancing. */
+.masonry__item.is-beyond {
+  display: none;
+}
 
 .thumb {
   position: relative;

@@ -8,7 +8,7 @@ permalink: /projects/
 {%- assign copy = site.data.content.projects -%}
 {%- assign n = site.projects | size -%}
 {%- capture eyebrow -%}{{ n }} build{% unless n == 1 %}s{% endunless %}{%- endcapture -%}
-{% include masthead.html title="Projects" eyebrow=eyebrow lede=copy.lede wide=true %}
+{% include masthead.html title="Projects" eyebrow=eyebrow wide=true %}
 
 <div class="container-wide">
   {% if site.projects.size > 0 %}

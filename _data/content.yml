@@ -34,39 +34,31 @@ home:
     - { label: "Photography", sub: "where I've been",    url: "/photography/", type: "photo",      wash: "sky"   }
     - { label: "Art",         sub: "my studies",         url: "/art/",         type: "art",        wash: "peach" }
     - { label: "Me",          sub: "off the clock",      url: "/me/",          type: "me",         wash: "lilac" }
-    - { label: "Blog",        sub: "notes & essays",     url: "/blog/",        type: "writing",    wash: "lav"   }
+    - { label: "Blog",        sub: "notes & essays",     url: "/blog/",        type: "writing",    wash: "rose"  }
 
 blog:
-  lede:  "World Notes: science, technology, nature, culture, travel, and the strange things I find along the way. On Substack."
   subscribe: "New writing, in your inbox."
   empty: "First posts coming soon."
   meta:  "World Notes by Aryan Kashem. Writing on science, technology, nature, culture, and travel. Read and subscribe on Substack."
 
 projects:
-  lede:  "My favorite firmware and electrical projects."
   empty: "Projects are on the way."
   meta:  "Embedded software and engineering projects."
 
 experiences:
-  lede:  "Roles and internships. The teams, the systems I worked on, and what I shipped."
   empty: "Experience is on the way."
   meta:  "My work history. Embedded firmware roles, internships, and the systems worked on."
 
 photography:
   eyebrow: "Photography"
-  intro: >-
-    My favorite photos. Filter by place or trip with the chips or search to find a shot, then click any image to view it full size.
   meta: "The whole collection, filterable by place and trip, viewable full-screen."
 
 art:
   eyebrow: "Sketchbook"
-  intro: >-
-    Sketches and other artwork. Filter by kind with the chips or search, then click any piece to view it full size.
   meta: "Realistic pencil sketches and other artworks. the whole collection, filterable by kind."
 
 resources:
   eyebrow: "Toolbox"
-  lede:  "Tools, references, and links I keep coming back to."
   empty: "Resource list coming soon."
   meta:  "Tools, references, and links I recommend for embedded engineering, photography, and travel."
 

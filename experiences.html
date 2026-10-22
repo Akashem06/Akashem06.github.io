@@ -8,7 +8,7 @@ permalink: /experiences/
 {%- assign copy = site.data.content.experiences -%}
 {%- assign n = site.experiences | size -%}
 {%- capture eyebrow -%}{{ n }} role{% unless n == 1 %}s{% endunless %}{%- endcapture -%}
-{% include masthead.html title="Experience" eyebrow=eyebrow lede=copy.lede wide=true %}
+{% include masthead.html title="Experience" eyebrow=eyebrow wide=true %}
 
 <div class="container-wide">
   {% if site.experiences.size > 0 %}

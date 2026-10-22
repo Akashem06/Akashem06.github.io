@@ -92,19 +92,45 @@
     };
   }
 
+  // Point the viewer <img> at a trigger anchor's image. When the anchor carries
+  // a data-srcset (an 800w/full pair emitted once the pipeline has the variants),
+  // the browser picks the right size for the viewport — phones skip the full
+  // 1200px. Falls back to the plain href otherwise.
+  function pointAt(target, trigger) {
+    var srcset = trigger.getAttribute("data-srcset");
+    if (srcset) {
+      target.setAttribute("sizes", trigger.getAttribute("data-sizes") || "100vw");
+      target.setAttribute("srcset", srcset);
+    } else {
+      target.removeAttribute("srcset");
+      target.removeAttribute("sizes");
+    }
+    target.setAttribute("src", trigger.getAttribute("href"));
+  }
+
+  // Warm a neighbour so prev/next feels instant — same source selection as the
+  // viewer, via a detached <img> the browser can cache.
+  function preload(trigger) {
+    if (!trigger) return;
+    var pre = new Image();
+    pointAt(pre, trigger);
+  }
+
   function show(i) {
     var list = slides();
     if (!list.length) return;
     index = (i + list.length) % list.length;
     var trigger = list[index];
-    var src = trigger.getAttribute("href");
-    imgEl.setAttribute("src", src);
+    pointAt(imgEl, trigger);
     captionEl.textContent = trigger.getAttribute("data-caption") || "";
     if (counterEl) counterEl.textContent = index + 1 + " / " + list.length;
     // Mirror the thumbnail's alt onto the full image for screen readers.
     var thumbImg = trigger.querySelector("img");
     imgEl.setAttribute("alt", thumbImg ? thumbImg.getAttribute("alt") || "" : "");
     resetZoom();
+    // Prefetch the immediate neighbours (wraps around the ends).
+    preload(list[(index + 1) % list.length]);
+    preload(list[(index - 1 + list.length) % list.length]);
   }
 
   function open(i, triggerEl) {

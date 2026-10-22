@@ -31,14 +31,16 @@ title: Aryan Kashem
   <div class="collage" id="collage" aria-hidden="true">
     {%- comment -%} projects: cover + any gallery shots (hardware / firmware / screens) {%- endcomment -%}
     {% for pr in projects %}
-      {% if pr.image %}<span class="ctile" data-type="project"><img src="{{ pr.image | replace: '/cover.jpg', '/thumb/cover.jpg' | relative_url }}" alt="" loading="lazy" decoding="async"/></span>{% endif %}
-      {% for shot in pr.gallery %}<span class="ctile" data-type="project"><img src="{{ shot.thumb | default: shot.image | relative_url }}" alt="" loading="lazy" decoding="async"/></span>{% endfor %}
+      {% if pr.image %}<span class="ctile" data-type="project"><img src="{{ pr.image | replace: '/cover.jpg', '/thumb/cover.jpg' | relative_url }}" alt="" loading="lazy" decoding="async" fetchpriority="low"/></span>{% endif %}
+      {% for shot in pr.gallery %}<span class="ctile" data-type="project"><img src="{{ shot.thumb | default: shot.image | relative_url }}" alt="" loading="lazy" decoding="async" fetchpriority="low"/></span>{% endfor %}
     {% endfor %}
     {%- comment -%} sketches: all of them (small body of work — keep it fully represented) {%- endcomment -%}
-    {% for a in art %}<span class="ctile" data-type="art"><img src="{{ a.thumb | default: a.image | relative_url }}" alt="" loading="lazy" decoding="async"/></span>{% endfor %}
-    {%- comment -%} photography: a recent slice so it complements, not dominates {%- endcomment -%}
+    {% for a in art %}<span class="ctile" data-type="art"><img src="{{ a.thumb | default: a.image | relative_url }}" alt="" loading="lazy" decoding="async" fetchpriority="low"/></span>{% endfor %}
+    {%- comment -%} photography: a recent slice so it complements, not dominates. Sized to
+      fill the fixed collage grid (too few tiles leaves gaps at the bottom). First paint stays
+      cheap anyway — every tile is a lazy-loaded thumb with fetchpriority="low". {%- endcomment -%}
     {% assign photo_wall = photo | slice: 0, 78 %}
-    {% for p in photo_wall %}<span class="ctile" data-type="photo"><img src="{{ p.thumb | default: p.image | relative_url }}" alt="" loading="lazy" decoding="async"/></span>{% endfor %}
+    {% for p in photo_wall %}<span class="ctile" data-type="photo"><img src="{{ p.thumb | default: p.image | relative_url }}" alt="" loading="lazy" decoding="async" fetchpriority="low"/></span>{% endfor %}
   </div>
 
   {%- comment -%} legibility scrim + a centered multi-colour watercolor bloom {%- endcomment -%}
