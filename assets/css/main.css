@@ -1801,47 +1801,89 @@ html[data-theme="dark"] .file::after { mix-blend-mode: screen; }
   padding-block: var(--space-6);
 }
 
-/* ---- Gallery: chips + search toolbar -------------------------------------- */
-/* Sticky under the nav so the filters stay reachable while scrolling a long
-   collage. Chips left (wrap/scroll), search right. */
-.gallery-toolbar {
+/* ---- Gallery: album rail + search (sticky sub-nav) ------------------------ */
+/* The collage is split into one section per album; this sticky bar under the
+   site nav is a horizontally-scrollable rail of album jump-links (scroll-spy
+   highlights the current one, wired in gallery.js) plus one live search box. It
+   jumps rather than filters — filtering is the search, applied across sections. */
+.gallery-rail {
   position: sticky;
   top: calc(var(--space-8) + var(--space-1));
   z-index: 20;
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
-  gap: var(--space-2) var(--space-2);
-  margin-bottom: var(--space-4);
-  /* An intentional control panel on the raised surface (same token as the nav),
-     so it reads a touch lighter than the canvas — never darker — in both themes. */
-  padding: var(--space-2);
+  gap: var(--space-2);
+  margin-bottom: var(--space-6);
+  padding: var(--space-1) var(--space-2);
   border: 1px solid var(--border);
-  border-radius: var(--radius);
-  background: var(--bg-elev); /* solid fallback (no backdrop-filter support) */
+  border-radius: 999px;
+  /* Solid (no backdrop-filter): a translucent blur here repaints every frame
+     while scrolling a long image grid, which was a source of jank. */
+  background: var(--bg-elev);
   box-shadow: 0 1px 0 var(--border), 0 8px 24px rgba(0, 0, 0, 0.06);
 }
-@supports (backdrop-filter: blur(10px)) or (-webkit-backdrop-filter: blur(10px)) {
-  .gallery-toolbar {
-    background: color-mix(in srgb, var(--bg-elev) 85%, transparent);
-    -webkit-backdrop-filter: blur(10px);
-    backdrop-filter: blur(10px);
-  }
-}
-html[data-theme="dark"] .gallery-toolbar {
+html[data-theme="dark"] .gallery-rail {
   box-shadow: 0 1px 0 var(--border), 0 10px 28px rgba(0, 0, 0, 0.35);
 }
+.gallery-rail__track {
+  display: flex;
+  gap: 4px;
+  flex: 1;
+  min-width: 0;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  /* fade both ends so the rail reads as scrollable */
+  -webkit-mask: linear-gradient(90deg, transparent, #000 18px, #000 calc(100% - 18px), transparent);
+  mask: linear-gradient(90deg, transparent, #000 18px, #000 calc(100% - 18px), transparent);
+}
+.gallery-rail__track::-webkit-scrollbar {
+  display: none;
+}
+.gallery-rail__track a {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  white-space: nowrap;
+  font-family: var(--font-mono);
+  font-size: var(--step-small);
+  font-weight: 500;
+  color: var(--text-dim);
+  text-decoration: none;
+  padding: 7px var(--space-2);
+  border-radius: 999px;
+  transition: color var(--speed) ease-out, background var(--speed) ease-out;
+}
+.gallery-rail__track a .c {
+  font-size: 0.82em;
+  opacity: 0.6;
+}
+.gallery-rail__track a:hover,
+.gallery-rail__track a:focus-visible {
+  color: var(--text);
+  background: color-mix(in srgb, var(--accent) 9%, transparent);
+}
+.gallery-rail__track a.is-active {
+  color: var(--on-accent);
+  background: var(--accent);
+}
+.gallery-rail__track a.is-active .c {
+  opacity: 0.75;
+}
+
 .gallery-search {
+  flex: none;
   display: flex;
   align-items: center;
   gap: var(--space-1);
-  margin-left: auto;
-  min-width: 12rem;
-  max-width: 22rem;
-  padding: 8px var(--space-2);
+  min-width: 10rem;
+  max-width: 18rem;
+  padding: 7px var(--space-2);
   border: 1px solid var(--border);
   border-radius: 999px;
-  background: var(--bg); /* match the chips — a pill on the elevated toolbar */
+  background: var(--bg); /* a pill on the elevated rail */
   color: var(--text-dim);
 }
 .gallery-search:focus-within {
@@ -1849,6 +1891,7 @@ html[data-theme="dark"] .gallery-toolbar {
 }
 .gallery-search input {
   flex: 1;
+  min-width: 0;
   border: 0;
   background: none;
   color: var(--text);
@@ -1856,123 +1899,119 @@ html[data-theme="dark"] .gallery-toolbar {
   outline: none;
 }
 
-/* ---- Gallery: album filter chips ------------------------------------------ */
-/* One chip per album ("All" first). The active chip carries a watercolor dab
-   behind it — the same wash language as the nav tabs (url(#wash-bloom)). */
-.gallery-chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-1);
-  min-width: 0;
+/* ---- Gallery: one section per album --------------------------------------- */
+.gsection {
+  margin-bottom: var(--space-8);
+  /* clear the sticky site nav (~72px) + the sticky album rail (~52px) when a
+     rail link jumps here, so the section header isn't tucked under the rail */
+  scroll-margin-top: calc(var(--space-10) + var(--space-6));
+  /* Skip layout/paint/style for off-screen trip sections (there are ~20+). The
+     `auto` keyword caches each section's real height once it's been rendered, so
+     the placeholder size only matters before first reveal; it also keeps the
+     scrollbar from jumping. One row of square tiles + header ≈ 360px. */
+  content-visibility: auto;
+  contain-intrinsic-size: auto 360px;
 }
-.gchip {
-  position: relative;
-  isolation: isolate;
+.gsection[hidden] {
+  display: none;
+}
+.gsection__head {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
+}
+.gsection__where {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin-bottom: 6px;
+}
+.gsection__head h2 {
+  font-family: var(--font-display);
+  font-size: var(--step-h2);
+  line-height: 1.05;
+}
+.gsection__rule {
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+  margin-bottom: 10px;
+}
+.gsection__all {
+  flex: none;
+  font-family: var(--font-mono);
+  font-size: var(--step-small);
+  color: var(--accent);
+  background: none;
+  border: 0;
+  cursor: pointer;
+  padding: 4px 0;
+  margin-bottom: 6px;
   display: inline-flex;
   align-items: center;
-  font: inherit;
-  font-size: var(--step-small);
-  font-weight: 600;
-  color: var(--text-dim);
-  background: var(--bg); /* canvas tone → reads as a pill on the elevated toolbar */
-  border: 1px solid var(--border);
-  border-radius: 999px;
-  padding: 7px var(--space-2);
-  cursor: pointer;
-  white-space: nowrap;
-  transition: color var(--speed) ease-out, border-color var(--speed) ease-out,
-    transform var(--speed) ease-out;
+  gap: 6px;
+  transition: gap var(--speed) ease-out;
 }
-.gchip .n {
-  font-family: var(--font-mono);
-  font-size: 0.78em;
-  opacity: 0.7;
-  margin-left: 6px;
-}
-.gchip:hover,
-.gchip:focus-visible {
-  color: var(--text);
-  transform: translateY(-1px);
-}
-.gchip.is-active {
-  color: var(--text);
-  border-color: transparent;
-}
-/* Watercolor dab bloom behind the active chip (carries its inline --w wash). */
-.gchip::before {
-  content: "";
-  position: absolute;
-  inset: -3px -2px;
-  z-index: -1;
-  border-radius: inherit;
-  background: var(--w, var(--lav));
-  opacity: 0;
-  transform: scale(0.7);
-  filter: url(#wash-bloom);
-  transition: opacity var(--speed) ease-out, transform var(--speed) ease-out;
-}
-.gchip.is-active::before {
-  opacity: 0.5;
-  transform: scale(1);
-}
-[data-theme="dark"] .gchip.is-active::before {
-  opacity: 0.4;
-}
-@media (prefers-reduced-motion: reduce) {
-  .gchip,
-  .gchip::before {
-    transition: none;
-  }
-}
-/* Narrow screens: the search takes the full first row and the chips become a
-   single horizontally scrollable strip (like the nav tabs) instead of stacking
-   into many rows — matters for photography's long album list. */
-@media (max-width: 640px) {
-  .gallery-search {
-    margin-left: 0;
-    max-width: none;
-    order: -1;
-    width: 100%;
-  }
-  .gallery-chips {
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
-    margin-inline: calc(-1 * var(--space-1));
-    padding-inline: var(--space-1);
-  }
-  .gallery-chips::-webkit-scrollbar {
-    display: none;
-  }
+.gsection__all:hover {
+  gap: 10px;
 }
 
-/* ---- Gallery: masonry via CSS columns -------------------------------------- */
-/* Dense pack like the home collage — same tight 0.36rem gutter. Aspect ratios vary,
-   so we don't fight them; we just tighten the gutters. --masonry-gap keeps the column
-   gutter and the row gutter (item margin-bottom) in sync. */
-.masonry {
-  --masonry-gap: 0.36rem;
-  column-count: 5;
-  column-gap: var(--masonry-gap);
+/* Uniform square-tile preview grid: every tile the same size, so the grid is
+   always a clean rectangle (no dense-flow holes) and cheap to lay out. Tiles
+   cover-crop to fill their cell; the full frame shows in the lightbox. Capped
+   sections (data-cap) hide overflow items via .is-hidden until "See all"; the
+   bottom fade hints there's more behind the cap. */
+.ggrid {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  gap: 8px;
 }
-.masonry__item {
-  break-inside: avoid;
-  /* Kill the browser's default <figure> margin (1em top, 40px sides) — that, not
-     the column gutter, was the big gap. Only the row gutter below remains. */
-  margin: 0 0 var(--masonry-gap);
+.ggrid.is-faded::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 80px;
+  background: linear-gradient(transparent, var(--bg));
+  pointer-events: none;
 }
-.masonry__item.is-hidden {
+.ggrid__item {
+  position: relative;
+  margin: 0;
+  aspect-ratio: 1;
+}
+.ggrid__item.is-hidden {
   display: none;
 }
-/* Windowing: items past the current render window are dropped from layout by
-   gallery.js (keeps the column count cheap at thousands of photos). Distinct
-   from .is-hidden (filtered out) so the lightbox can still walk the full
-   filtered set — it reads each item's <a href>, not the thumbnail. We window in
-   JS rather than `content-visibility:auto` because the latter fights CSS
-   multi-column balancing. */
-.masonry__item.is-beyond {
-  display: none;
+.ggrid__item .thumb {
+  height: 100%;
+}
+.ggrid__item .thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+@media (max-width: 640px) {
+  .ggrid {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 6px;
+  }
+  .gallery-rail {
+    flex-wrap: wrap;
+    border-radius: var(--radius);
+  }
+  .gallery-search {
+    order: -1;
+    width: 100%;
+    max-width: none;
+  }
 }
 
 .thumb {
@@ -2477,20 +2516,10 @@ html[data-theme="dark"] .gallery-toolbar {
 }
 
 /* ---- Responsive ------------------------------------------------------------ */
-@media (max-width: 1024px) {
-  .masonry {
-    column-count: 3;
-  }
-}
-
 @media (max-width: 640px) {
   :root {
     --step-h1: 2rem;
     --step-h2: 1.5rem;
-  }
-  .masonry {
-    --masonry-gap: 0.26rem;
-    column-count: 2;
   }
 
   /* Mobile nav: brand + toggle stay on row one; the wash tabs drop to a second

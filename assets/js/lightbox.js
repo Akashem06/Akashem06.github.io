@@ -17,13 +17,15 @@
   var zoomLevelEl = document.getElementById("lightbox-zoom-level");
 
   // Build the slide list from the *visible* thumbnails (skips items hidden by
-  // the current folder filter / search), preserving DOM order.
+  // the current search or a collapsed section cap), preserving DOM order.
+  // offsetParent is null for display:none elements, so this covers every way a
+  // thumb can be hidden without the lightbox needing to know the gallery's
+  // classes.
   function slides() {
     return Array.prototype.filter.call(
       gallery.querySelectorAll(".thumb"),
       function (thumb) {
-        var item = thumb.closest(".masonry__item");
-        return !item || !item.classList.contains("is-hidden");
+        return thumb.offsetParent !== null;
       }
     );
   }

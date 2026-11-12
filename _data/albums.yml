@@ -1,0 +1,45 @@
+# Per-album display metadata for the sectioned gallery (_layouts/gallery.html).
+# Keyed by the album name slugified: "Isle Of Skye" -> isle-of-skye,
+# "FSGP 2026" -> fsgp-2026, "San Francisco" -> san-francisco.
+#
+# `where` — region/country shown under the trip title. Albums with no entry fall
+#           back to the first photo's `location`.
+# `when`  — OPTIONAL trip date (free text, e.g. "Jun 2026"), shown after `where`.
+#           The photo `date` field is the date-ADDED (used only to order albums,
+#           newest first), NOT when the trip happened — so set `when` by hand if
+#           you want a real date under the title. Leave it off and the line is
+#           just the region. Example: isle-of-skye: { where: "Scotland", when: "Sep 2026" }
+#
+# Everything here is optional — delete an album and its section simply loses the
+# label. Art albums are intentionally omitted (they're mediums, not trips).
+
+# --- Canada ---
+alberta:        { where: "Canada" }
+toronto:        { where: "Canada" }
+
+# --- California / USA ---
+san-francisco:  { where: "California, USA" }
+monterey:       { where: "California, USA" }
+pacifica:       { where: "California, USA" }
+muir-woods:     { where: "California, USA" }
+alcatraz:       { where: "California, USA" }
+sausalito:      { where: "California, USA" }
+santa-cruz:     { where: "California, USA" }
+fsgp-2026:      { where: "Brainerd, Minnesota" }
+
+# --- Scotland / England ---
+isle-of-skye:   { where: "Scotland" }
+glasgow:        { where: "Scotland" }
+edinburgh:      { where: "Scotland" }
+london:         { where: "England" }
+
+# --- Spain ---
+madrid:         { where: "Spain" }
+malaga:         { where: "Spain" }
+toledo:         { where: "Spain" }
+cordoba:        { where: "Spain" }
+mallorca:       { where: "Spain" }
+barcelona:      { where: "Spain" }
+
+# --- Monaco ---
+monaco:         { where: "Monaco" }

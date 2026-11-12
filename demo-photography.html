@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Photography — sectioned rows</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Gloock&family=Spectral:ital,wght@0,400;0,600;1,400&family=Spline+Sans+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+:root{
+  --paper:#f7f2e9; --paper-elev:#fffdf8; --ink:#272220; --ink-soft:#766b62;
+  --plum:#5b4a8a; --plum-deep:#493a70; --line:#e4dac9;
+  --lav:#7b57c8; --peach:#e8734e; --sage:#64a95e; --sky:#3aa0c9;
+  --gold:#e0a53a; --rose:#d95d8a; --teal:#2fa79b;
+  --bg:var(--paper); --bg-elev:var(--paper-elev); --border:var(--line);
+  --text:var(--ink); --text-dim:var(--ink-soft); --accent:var(--plum);
+  --font-display:"Gloock",Georgia,serif;
+  --font-body:"Spectral",Georgia,serif;
+  --font-mono:"Spline Sans Mono",ui-monospace,Menlo,monospace;
+  --radius:14px; --r:18px; --speed:175ms;
+  --shadow-soft:0 10px 30px rgba(91,74,138,.16);
+  --s1:8px; --s2:16px; --s3:24px; --s4:32px; --s6:48px; --s8:64px;
+  --navh:60px;
+}
+html[data-theme="dark"]{
+  --paper:#0f1115; --paper-elev:#171a20; --ink:#e8eaed; --ink-soft:#9aa0a8;
+  --plum:#c9a76a; --plum-deep:#b8934f; --line:#262a31;
+  --shadow-soft:0 14px 36px rgba(0,0,0,.55);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0; background:var(--bg); color:var(--text); font-family:var(--font-body); font-size:1.0625rem; line-height:1.6; -webkit-font-smoothing:antialiased}
+img{display:block; width:100%; height:100%; object-fit:cover}
+h1,h2,h3{font-family:var(--font-display); font-weight:400; line-height:1.08; margin:0}
+.kicker{font-family:var(--font-mono); font-size:.72rem; letter-spacing:.18em; text-transform:uppercase; color:var(--accent)}
+
+/* ---------- improved sticky top nav ---------- */
+.topnav{
+  position:sticky; top:0; z-index:60; height:var(--navh);
+  display:flex; align-items:center; gap:var(--s3);
+  padding:0 clamp(16px,4vw,48px);
+  background:color-mix(in srgb,var(--bg) 82%,transparent);
+  backdrop-filter:saturate(1.3) blur(14px); -webkit-backdrop-filter:saturate(1.3) blur(14px);
+  border-bottom:1px solid var(--border);
+}
+.topnav .brand{display:flex; align-items:baseline; gap:10px; flex:none}
+.topnav .brand .name{font-family:var(--font-display); font-size:1.15rem; letter-spacing:.01em}
+.topnav .brand .tally{font-family:var(--font-mono); font-size:.68rem; letter-spacing:.1em; text-transform:uppercase; color:var(--text-dim)}
+.topnav .divline{width:1px; height:24px; background:var(--border); flex:none}
+.railwrap{position:relative; flex:1; min-width:0}
+.rail{display:flex; gap:4px; overflow-x:auto; scrollbar-width:none; scroll-behavior:smooth; padding:4px 0; mask:linear-gradient(90deg,transparent,#000 18px,#000 calc(100% - 18px),transparent)}
+.rail::-webkit-scrollbar{display:none}
+.rail a{
+  position:relative; white-space:nowrap; flex:none; display:inline-flex; align-items:center; gap:7px;
+  font-family:var(--font-mono); font-size:.76rem; letter-spacing:.01em; text-decoration:none;
+  color:var(--text-dim); padding:7px 13px; border-radius:999px; border:1px solid transparent; transition:color var(--speed) ease, background var(--speed) ease;
+}
+.rail a .c{font-size:.84em; opacity:.55}
+.rail a:hover{color:var(--text); background:color-mix(in srgb,var(--accent) 8%,transparent)}
+.rail a.on{color:#fff; background:var(--accent)}
+html[data-theme="dark"] .rail a.on{color:var(--paper)}
+.rail a.on .c{opacity:.7}
+.themebtn{flex:none; font-family:var(--font-mono); font-size:.9rem; width:36px; height:36px; border-radius:50%; border:1px solid var(--border); background:var(--bg-elev); color:var(--text); cursor:pointer; transition:all var(--speed) ease}
+.themebtn:hover{border-color:var(--accent); color:var(--accent)}
+
+.wrap{max-width:1240px; margin:0 auto; padding:var(--s8) clamp(16px,4vw,48px) var(--s8)}
+
+/* masthead */
+.mast{margin-bottom:var(--s6)}
+.mast h1{font-size:clamp(2.6rem,1.7rem+3.4vw,4rem); letter-spacing:-.01em}
+.mast .sub{color:var(--text-dim); margin-top:8px; font-style:italic; max-width:52ch}
+
+/* ---------- a trip section ---------- */
+.section{margin-bottom:var(--s8); scroll-margin-top:calc(var(--navh) + 20px)}
+.shead{display:flex; align-items:flex-end; gap:16px; margin-bottom:var(--s3)}
+.shead .ttl h2{font-size:clamp(1.6rem,1.2rem+1vw,2.1rem)}
+.shead .ttl .where{font-family:var(--font-mono); font-size:.7rem; letter-spacing:.14em; text-transform:uppercase; color:var(--text-dim); margin-bottom:6px; display:block}
+.shead .flex{flex:1; height:1px; background:var(--border); margin-bottom:10px}
+.shead .seeall{flex:none; font-family:var(--font-mono); font-size:.74rem; letter-spacing:.04em; color:var(--accent); background:none; border:0; cursor:pointer; padding:4px 0; margin-bottom:6px; display:inline-flex; align-items:center; gap:6px; transition:gap var(--speed) ease}
+.shead .seeall:hover{gap:10px}
+
+/* ragged row — capped, expands on demand */
+.grid{
+  display:grid; grid-template-columns:repeat(12,1fr); gap:10px;
+  grid-auto-rows:120px; grid-auto-flow:dense;
+  overflow:hidden; max-height:500px; transition:max-height .55s cubic-bezier(.2,.7,.2,1);
+}
+.grid.full{max-height:4000px}
+.ph{position:relative; border-radius:12px; overflow:hidden; background:var(--bg-elev); cursor:zoom-in; grid-column:span 3; grid-row:span 2}
+.ph.w4{grid-column:span 4} .ph.w6{grid-column:span 6} .ph.t3{grid-row:span 3}
+.ph::after{content:""; position:absolute; inset:0; border-radius:inherit; box-shadow:inset 0 0 0 1px rgba(0,0,0,.05); pointer-events:none}
+.ph img{transition:transform .6s cubic-bezier(.2,.7,.2,1)}
+.ph:hover img{transform:scale(1.05)}
+.ph .cap{position:absolute; left:0; right:0; bottom:0; padding:12px 12px 10px; background:linear-gradient(transparent,rgba(10,8,14,.72)); color:#fff; font-size:.82rem; opacity:0; transform:translateY(6px); transition:all var(--speed) ease}
+.ph:hover .cap{opacity:1; transform:none}
+.fade{position:relative}
+.fade::after{content:""; position:absolute; left:0; right:0; bottom:0; height:90px; background:linear-gradient(transparent,var(--bg)); pointer-events:none; opacity:1; transition:opacity var(--speed)}
+.fade.open::after{opacity:0}
+
+@media(max-width:900px){
+  .grid{grid-template-columns:repeat(6,1fr); grid-auto-rows:110px}
+  .ph{grid-column:span 3} .ph.w4,.ph.w6{grid-column:span 6}
+  .topnav .brand .tally{display:none}
+}
+@media(max-width:560px){
+  .grid{grid-template-columns:repeat(4,1fr); grid-auto-rows:46vw}
+  .ph,.ph.w4,.ph.w6{grid-column:span 2; grid-row:span 1}
+  .ph.t3{grid-row:span 1}
+}
+.note{margin:0 0 var(--s6); padding:14px 18px; border:1px dashed var(--border); border-radius:var(--radius); font-size:.92rem; color:var(--text-dim); background:var(--bg-elev)}
+.note b{color:var(--text); font-style:normal}
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <div class="brand">
+    <span class="name">Photography</span>
+    <span class="tally" id="tally"></span>
+  </div>
+  <div class="divline"></div>
+  <div class="railwrap"><div class="rail" id="rail"></div></div>
+  <button class="themebtn" id="themeBtn" title="Toggle theme">◐</button>
+</nav>
+
+<div class="wrap">
+  <div class="mast">
+    <span class="kicker">Field work</span>
+    <h1>Photography</h1>
+    <p class="sub">Every trip its own chapter — scroll through, or jump straight to one from the rail above. Each section opens to the full set.</p>
+  </div>
+  <p class="note">Demo of the <b>sectioned-rows</b> layout with real curated selections per trip. The top rail highlights as you scroll (scroll-spy) and the hidden rows fade in when you hit <b>See all</b>. Toggle light/dark top-right.</p>
+  <div id="sections"></div>
+</div>
+
+<script>
+const G="assets/images/gallery/";
+const img=(f,n)=>`${G}${f}/${n}.webp`;
+// [folder, label, where, totalCount, [curated filenames...]]
+const A=[
+  ["isle-of-skye","Isle of Skye","Scotland · Sep 2026",45,["isle-of-skye-1","isle-of-skye-2","isle-of-skye-10","isle-of-skye-11","isle-of-skye-12","isle-of-skye-13","isle-of-skye-14","isle-of-skye-15","isle-of-skye-16","isle-of-skye-17","isle-of-skye-18","isle-of-skye-19"]],
+  ["madrid","Madrid","Spain · Jun 2026",34,["madrid-1","madrid-2","madrid-3","madrid-4","madrid-5","madrid-6","madrid-7","madrid-8","madrid-9","madrid-10","madrid-11","madrid-12"]],
+  ["alberta","Alberta","Canada · Aug 2026",90,["barrier-lake-1","barrier-lake-2","canmore-1","canmore-2","canmore-3","red-canyon-1","red-canyon-2","troll-falls-1","troll-falls-2","big-beehive-hike-1","kananaskis-village-1","barrier-lake-3"]],
+  ["toronto","Toronto","Canada · 2026",48,["toronto-1","toronto-2","toronto-3","torontoago-1","torontoago-2","torontoislands-2","torontoislands-3","torontosubway-1","torontosubway-2","aryanago-1","toronto-4","torontolibrary"]],
+  ["malaga","Málaga","Spain · Jun 2026",26,["malaga-1","malaga-2","malaga-3","malaga-4","malaga-5","malaga-6","malaga-7","malaga-8","malaga-9","malaga-10","malaga-11","malaga-12"]],
+  ["london","London","England · 2026",25,["london-1","london-2","london-3","london-4","london-5","london-6","london-7","london-8","london-9","london-10","london-11","london-12"]],
+  ["toledo","Toledo","Spain · Jun 2026",19,["toledo-1","toledo-2","toledo-3","toledo-4","toledo-5","toledo-6","toledo-7","toledo-8","toledo-9","toledo-10","toledo-11","toledo-12"]],
+  ["cordoba","Córdoba","Spain · Jun 2026",16,["cordoba-1","cordoba-2","cordoba-3","cordoba-4","cordoba-5","cordoba-6","cordoba-7","cordoba-8","cordoba-9","cordoba-10","cordoba-11","cordoba-12"]],
+  ["muir-woods","Muir Woods","California · 2026",12,["muirwoods","muirwoods-1","muirwoods-2","muirwoods-3","muirwoods-4","muirwoods-5","muirwoods-6","muirwoods-7","muirwoods-8","muirwoods-9","muirwoods-10","muirwoods-11"]],
+  ["alcatraz","Alcatraz","California · 2026",11,["onalcatraz-1","onalcatraz-2","onalcatraz-3","onalcatraz-4","onalcatraz-5","onalcatraz-6","onalcatraz-7","onalcatraz-8","onalcatraz-9","onalcatraz-10","onalcatraz-11"]],
+  ["fsgp-2026","FSGP","Minnesota · Jul 2026",11,["fsgp-2026-minnesota-1","fsgp-2026-minnesota-2","fsgp-2026-minnesota-3","fsgp-2026-minnesota-4","fsgp-2026-minnesota-5","fsgp-2026-minnesota-6","fsgp-2026-minnesota-7","fsgp-2026-minnesota-8","fsgp-2026-minnesota-9","fsgp-2026-minnesota-10","fsgp-2026-minnesota-11"]],
+  ["mallorca","Mallorca","Spain · Jun 2026",10,["mallorca-1","mallorca-2","mallorca-3","mallorca-4","mallorca-5","mallorca-6","mallorca-7","mallorca-8","mallorca-9","mallorca-10"]],
+  ["monaco","Monaco","Monaco · Jun 2026",9,["monaco-1","monaco-2","monaco-3","monaco-4","monaco-5","monaco-6","monaco-7","monaco-8","monaco-9"]],
+  ["barcelona","Barcelona","Spain · Jun 2026",7,["barcelona-1","barcelona-2","barcelona-3","barcelona-4","barcelona-5","barcelona-6","barcelona-7"]],
+  ["edinburgh","Edinburgh","Scotland · Sep 2026",5,["edinburgh-1","edinburgh-2","edinburgh-3","edinburgh-4","edinburgh-5"]],
+  ["glasgow","Glasgow","Scotland · Sep 2026",5,["glasgow-1","glasgow-2","glasgow-3","glasgow-4","glasgow-5"]],
+];
+
+// a repeating rhythm of tile sizes so rows feel edited, not uniform
+const shapes=["w6 t3","","","w4","","w4","","","w6","","w4",""];
+
+const rail=document.getElementById("rail");
+const sections=document.getElementById("sections");
+let total=0;
+
+A.forEach((a,ai)=>{
+  const [f,label,where,count,pics]=a; total+=count;
+  const id="t-"+f;
+
+  const link=document.createElement("a");
+  link.href="#"+id; link.dataset.id=id;
+  link.innerHTML=`${label} <span class="c">${count}</span>`;
+  rail.append(link);
+
+  const sec=document.createElement("section");
+  sec.className="section"; sec.id=id;
+  const tiles=pics.map((n,i)=>{
+    const sh=shapes[i%shapes.length];
+    return `<figure class="ph ${sh}"><img src="${img(f,n)}" loading="lazy" alt="${label} ${i+1}"><figcaption class="cap">${label}</figcaption></figure>`;
+  }).join("");
+  sec.innerHTML=`
+    <div class="shead">
+      <div class="ttl"><span class="where">${where}</span><h2>${label}</h2></div>
+      <span class="flex"></span>
+      <button class="seeall">See all ${count} →</button>
+    </div>
+    <div class="fade"><div class="grid">${tiles}</div></div>`;
+  const fade=sec.querySelector(".fade"), grid=sec.querySelector(".grid"), btn=sec.querySelector(".seeall");
+  btn.addEventListener("click",()=>{
+    const open=grid.classList.toggle("full"); fade.classList.toggle("open",open);
+    btn.innerHTML=open?"Show less ↑":`See all ${count} →`;
+  });
+  sections.append(sec);
+});
+
+document.getElementById("tally").textContent=`${A.length} trips · ${total} photos`;
+
+/* scroll-spy: highlight the rail pill for the section in view */
+const links=[...rail.querySelectorAll("a")];
+const byId=Object.fromEntries(links.map(l=>[l.dataset.id,l]));
+const io=new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){
+      links.forEach(l=>l.classList.remove("on"));
+      const a=byId[e.target.id];
+      if(a){a.classList.add("on"); a.scrollIntoView({inline:"center",block:"nearest"});}
+    }
+  });
+},{rootMargin:"-45% 0px -50% 0px"});
+A.forEach(a=>io.observe(document.getElementById("t-"+a[0])));
+
+document.getElementById("themeBtn").addEventListener("click",()=>{
+  const h=document.documentElement; h.dataset.theme=h.dataset.theme==="dark"?"light":"dark";
+});
+</script>
+</body>
+</html>

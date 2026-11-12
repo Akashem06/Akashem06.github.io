@@ -3,13 +3,20 @@ layout: default
 ---
 {%- comment -%}
   Bucket gallery: one page per bucket (page.bucket = "photography" | "art").
-  You land straight on the whole collage — every item in the bucket as one
-  masonry. Narrow it with the filter chips (one per album, "All" first) or the
-  live search; nothing drills into folders. All filtering + lightbox behaviour is
-  wired by gallery.js + lightbox.js (loaded explicitly below — layout front matter
-  does NOT set page.lightbox).
+  The collage is split into one SECTION per album, newest addition first (albums
+  are ordered by their most-recently-added photo — the same convention as the
+  home "newest additions" carousel). Each section shows a capped, edited-looking
+  preview grid; "See all" expands it in place. A sticky rail at the top jumps
+  between albums (scroll-spy highlights the current one) and a single search box
+  filters across every album in place. No folders, no reloads — all section /
+  search / lightbox behaviour is wired by gallery.js + lightbox.js (loaded below;
+  layout front matter does NOT set page.lightbox).
+
+  Per-album region ("where") and an optional trip date ("when") live in
+  _data/albums.yml (keyed by the slugified album). The item `date` is the
+  date-added (used only for ordering), not the trip date, so we do NOT derive a
+  month from it — set `when` by hand if you want a date under a title.
 {%- endcomment -%}
-{%- comment -%} Eyebrow + intro copy live in _data/content.yml (keyed by bucket). {%- endcomment -%}
 {%- assign gcopy = site.data.content[page.bucket] -%}
 {%- assign bucket_items = site.galleries | where: "bucket", page.bucket -%}
 {%- assign n = bucket_items | size -%}
@@ -22,14 +29,26 @@ layout: default
   <p class="muted gallery-empty">Nothing here yet. Check back soon.</p>
   {%- else -%}
 
-  {%- assign groups = bucket_items | group_by: "album" -%}
-  {%- assign washes = "lav,peach,sage,sky,gold,rose,teal,tomato" | split: "," -%}
-  <div class="gallery-toolbar">
-    <div class="gallery-chips" id="gallery-chips" role="group" aria-label="Filter by album">
-      <button class="gchip is-active" type="button" data-album="all" style="--w: var(--lilac)">All <span class="n">{{ n }}</span></button>
+  {%- comment -%} Sort by date desc, THEN group: groups come out newest-trip-first,
+    and each group's items stay newest-first (first item = the album cover/date). {%- endcomment -%}
+  {%- assign sorted = bucket_items | sort: "date" | reverse -%}
+  {%- assign groups = sorted | group_by: "album" -%}
+  {%- assign albums = site.data.albums -%}
+  {%- comment -%} Only the first `live` items of each album are rendered as real
+    nodes (enough to fill one row on any realistic width — minmax(190px,1fr) tops
+    out around 12 columns even on ultrawide). The rest ride along inside an inert
+    <template>, which the browser parses but never lays out, paints, or fetches
+    images for, so first load stays cheap. gallery.js "hydrates" (clones the
+    template into the grid) only when the visitor hits "See all" or searches, then
+    trims each collapsed section to exactly one measured row (re-measured on
+    resize). No-JS fallback: the `live` items show as a clean grid. {%- endcomment -%}
+  {%- assign live = 12 -%}
+
+  <nav class="gallery-rail" aria-label="Jump to album">
+    <div class="gallery-rail__track" id="gallery-rail">
       {%- for g in groups -%}
-      {%- assign wi = forloop.index0 | modulo: washes.size -%}
-      <button class="gchip" type="button" data-album="{{ g.name | slugify }}" style="--w: var(--{{ washes[wi] }})">{{ g.name | default: "Untitled" }} <span class="n">{{ g.items | size }}</span></button>
+      {%- assign slug = g.name | slugify -%}
+      <a href="#album-{{ slug }}" data-target="album-{{ slug }}">{{ g.name | default: "Untitled" }} <span class="c">{{ g.items | size }}</span></a>
       {%- endfor -%}
     </div>
     <label class="gallery-search">
@@ -39,38 +58,67 @@ layout: default
       </svg>
       <input type="search" id="gallery-search" placeholder="Search {{ page.title | downcase }}…" aria-label="Search {{ page.title | downcase }}" autocomplete="off" />
     </label>
-  </div>
+  </nav>
 
-  <p class="gallery-empty muted" id="gallery-empty" hidden>Nothing matches. Try another word or clear the filter.</p>
+  <p class="gallery-empty muted" id="gallery-empty" hidden>Nothing matches. Try another word or clear the search.</p>
 
-  {%- comment -%} The whole collage — every item, always present; filtered in place. {%- endcomment -%}
-  {%- assign items = bucket_items | sort: "date" | reverse -%}
-  <div class="masonry" id="gallery">
-    {%- for item in items -%}
-    {%- capture search_terms -%}{{ item.title }} {{ item.location }} {{ item.album }} {{ item.alt }}{% if item.featured %} featured{% endif %}{%- endcapture -%}
-    {%- comment -%} Photography is one 700px file (no thumb); Art keeps a small thumb, so
-      the grid still uses thumb-when-present, image otherwise. image_dims stamps
-      width/height (no extra files) so there's no layout shift. {%- endcomment -%}
-    {%- assign thumb_src = item.thumb | default: item.image -%}
-    <figure class="masonry__item"
-      data-album="{{ item.album | slugify }}"
-      data-search="{{ search_terms | escape }}">
-      <a
-        class="thumb"
-        href="{{ item.image | relative_url }}"
-        data-caption="{{ item.title }}{% if item.location %} · {{ item.location }}{% endif %}"
-        aria-label="View: {{ item.alt | escape }}"
-      >
-        <img
-          src="{{ thumb_src | relative_url }}"
-          {{ thumb_src | image_dims }}
-          alt="{{ item.alt }}"
-          loading="lazy"
-          decoding="async"
-        />
-        {% if item.title %}<figcaption class="thumb__caption">{{ item.title }}</figcaption>{% endif %}
-      </a>
-    </figure>
+  {%- comment -%} Every item is in the DOM (so search stays instant + client-side);
+    items past the cap start hidden and reveal on "See all". {%- endcomment -%}
+  <div id="gallery" class="gallery-sections">
+    {%- for g in groups -%}
+    {%- assign slug = g.name | slugify -%}
+    {%- assign meta = albums[slug] -%}
+    {%- assign cover_item = g.items | first -%}
+    {%- assign total = g.items | size -%}
+    {%- capture whereline -%}{% if meta.where %}{{ meta.where }}{% elsif cover_item.location %}{{ cover_item.location }}{% endif %}{%- endcapture -%}
+    {%- assign whereline = whereline | strip -%}
+    <section class="gsection" id="album-{{ slug }}" data-album="{{ slug }}">
+      <div class="gsection__head">
+        <div class="gsection__title">
+          {%- if whereline != "" or meta.when -%}<span class="gsection__where">{{ whereline }}{% if whereline != "" and meta.when %} · {% endif %}{{ meta.when }}</span>{%- endif -%}
+          <h2>{{ g.name | default: "Untitled" }}</h2>
+        </div>
+        <span class="gsection__rule"></span>
+        {%- comment -%} Always rendered; gallery.js hides it when the album already fits one row. {%- endcomment -%}
+        <button class="gsection__all" type="button" aria-expanded="false"{% if total <= live %} style="display:none"{% endif %}>See all {{ total }} <span aria-hidden="true">→</span></button>
+      </div>
+
+      {%- comment -%} Items past `live` are wrapped in a <template> (opened right
+        before item live+1, closed after the last) so the figure markup stays in
+        ONE place — gallery.js clones the template's children into the grid on
+        demand. {%- endcomment -%}
+      {%- assign live1 = live | plus: 1 -%}
+      <div class="ggrid{% if total > live %} is-faded{% endif %}" data-total="{{ total }}">
+        {%- for item in g.items -%}
+        {%- if forloop.index == live1 -%}<template class="ggrid-rest">{%- endif -%}
+        {%- capture search_terms -%}{{ item.title }} {{ item.location }} {{ item.album }} {{ item.alt }}{% if item.featured %} featured{% endif %}{%- endcapture -%}
+        {%- comment -%} Photography is one ~800px file (no thumb); Art keeps a small thumb.
+          image_dims stamps width/height (no extra files) so there's no layout shift. {%- endcomment -%}
+        {%- assign thumb_src = item.thumb | default: item.image -%}
+        <figure
+          class="ggrid__item"
+          data-album="{{ slug }}"
+          data-search="{{ search_terms | escape }}">
+          <a
+            class="thumb"
+            href="{{ item.image | relative_url }}"
+            data-caption="{{ item.title }}{% if item.location %} · {{ item.location }}{% endif %}"
+            aria-label="View: {{ item.alt | escape }}"
+          >
+            <img
+              src="{{ thumb_src | relative_url }}"
+              {{ thumb_src | image_dims }}
+              alt="{{ item.alt }}"
+              loading="lazy"
+              decoding="async"
+            />
+            {% if item.title %}<figcaption class="thumb__caption">{{ item.title }}</figcaption>{% endif %}
+          </a>
+        </figure>
+        {%- if forloop.last and total > live -%}</template>{%- endif -%}
+        {%- endfor -%}
+      </div>
+    </section>
     {%- endfor -%}
   </div>
 

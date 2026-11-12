@@ -5,6 +5,6 @@ title: "Madrid 16"
 image: /assets/images/gallery/madrid/madrid-16.webp
 alt: "Madrid, Spain"
 location: "Madrid, Spain"
-date: '2026-09-06'
+date: '2026-09-07'
 featured: false
 ---

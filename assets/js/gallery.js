@@ -1,129 +1,169 @@
-/* Collage filtering for a bucket gallery page (photography / art).
-   You land on the whole collage; this narrows it in place by album chip + live
-   search — no folders, no reload, no image refetch, just toggling `.is-hidden`.
-   lightbox.js reads the *visible* thumbnails, so the viewer automatically follows
-   whatever the chips/search have narrowed the grid to. */
+/* Sectioned bucket gallery (photography / art). The collage is split into one
+   section per album, newest trip first. Each section renders only its first row
+   or so of photos as real nodes; the rest ride inside an inert <template> and are
+   "hydrated" (cloned into the grid) the moment the visitor hits "See all" or
+   searches — so first load only pays for what's on screen. A sticky rail jumps
+   between albums (with scroll-spy); one search box filters across every album at
+   once. lightbox.js reads the *visible* thumbnails, so the viewer always follows
+   whatever is on screen (current section state + search). */
 (function () {
   "use strict";
 
   var page = document.querySelector(".gallery-page");
   if (!page) return;
 
-  var chips = document.getElementById("gallery-chips");
-  var search = document.getElementById("gallery-search");
   var gallery = document.getElementById("gallery");
+  if (!gallery) return;
+  var search = document.getElementById("gallery-search");
   var empty = document.getElementById("gallery-empty");
   var countEl = document.getElementById("gallery-count");
-  if (!gallery) return;
+  var rail = document.getElementById("gallery-rail");
 
-  var items = Array.prototype.slice.call(gallery.querySelectorAll(".masonry__item"));
-  var album = "all"; // active chip
+  // Model each album section: grid, live items, the <template> of deferred items
+  // (null once hydrated), "See all" button, expand state.
+  var sections = Array.prototype.slice.call(gallery.querySelectorAll(".gsection")).map(function (el) {
+    var tmpl = el.querySelector("template.ggrid-rest");
+    return {
+      el: el,
+      grid: el.querySelector(".ggrid"),
+      items: Array.prototype.slice.call(el.querySelectorAll(".ggrid__item")),
+      tmpl: tmpl,
+      hydrated: !tmpl, // sections with no overflow are fully live already
+      btn: el.querySelector(".gsection__all"),
+      expanded: false
+    };
+  });
 
-  // --- Windowing -------------------------------------------------------------
-  // Only the first WINDOW matched items are laid out; the rest are dropped from
-  // flow (.is-beyond) so the CSS-column grid stays cheap no matter how many
-  // photos exist. A sentinel below the grid reveals BATCH more as you scroll.
-  // `matched` is the full count that passes the current filter (what the counter
-  // shows); `limit` is how many of those we currently render. Lazy-loading means
-  // even rendered-but-off-screen thumbs don't fetch until near the viewport.
-  var WINDOW = 80;
-  var BATCH = 60;
-  var limit = WINDOW;
-  var matched = 0;
+  var lastCols = 0;
 
-  // Re-run the filter for the current chip + search term, updating the count.
-  function apply() {
+  // Clone a section's deferred items into its grid (once). Idempotent.
+  function hydrate(s) {
+    if (s.hydrated) return;
+    if (s.tmpl) {
+      s.grid.appendChild(s.tmpl.content); // moves the fragment's children in
+      if (s.tmpl.parentNode) s.tmpl.parentNode.removeChild(s.tmpl);
+      s.tmpl = null;
+    }
+    s.hydrated = true;
+    s.items = Array.prototype.slice.call(s.grid.querySelectorAll(".ggrid__item"));
+  }
+
+  // How many columns the grid currently has. Every grid shares one CSS template
+  // at the same width, so we measure ONE on-screen reference (the first section,
+  // always at the top → laid out even with content-visibility) and reuse it for
+  // all sections — instead of forcing a reflow per section.
+  function measureCols() {
+    var ref = sections[0] && sections[0].grid;
+    if (!ref) return 1;
+    var tpl = getComputedStyle(ref).getPropertyValue("grid-template-columns");
+    if (!tpl || tpl === "none") return lastCols || 1;
+    var n = tpl.trim().split(/\s+/).length;
+    return n > 0 ? n : 1;
+  }
+
+  // Re-evaluate what's visible for the current search term + per-section state.
+  function render() {
     var q = search ? search.value.trim().toLowerCase() : "";
-    var shown = 0; // how many matches we've actually rendered (<= limit)
-    matched = 0;
-    items.forEach(function (item) {
-      var okAlbum = album === "all" || item.dataset.album === album;
-      var okSearch = !q || (item.dataset.search || "").toLowerCase().indexOf(q) !== -1;
-      var vis = okAlbum && okSearch;
-      item.classList.toggle("is-hidden", !vis);
-      if (vis) {
-        matched++;
-        var within = shown < limit;
-        item.classList.toggle("is-beyond", !within);
-        if (within) shown++;
-      } else {
-        item.classList.remove("is-beyond");
-      }
+    // Searching needs every photo to be a real node, so hydrate on first query.
+    if (q) sections.forEach(function (s) { if (!s.hydrated) hydrate(s); });
+
+    var cols = measureCols(); // one row = this many items (search ignores it)
+    lastCols = cols;
+    var total = 0;
+    sections.forEach(function (s) {
+      // Ultrawide safety: if one row is wider than what we rendered live, pull the
+      // rest in so the first row always fills.
+      if (!q && s.tmpl && !s.hydrated && cols > s.items.length) hydrate(s);
+      var matched = 0;
+      s.items.forEach(function (item) {
+        var matches = !q || (item.dataset.search || "").toLowerCase().indexOf(q) !== -1;
+        // Searching → show every match; collapsed → just the first row; expanded → all.
+        var vis = matches && (q ? true : s.expanded || matched < cols);
+        item.classList.toggle("is-hidden", !vis);
+        if (matches) matched++;
+      });
+      total += matched;
+      // While searching, drop a whole section if nothing in it matches.
+      s.el.hidden = q !== "" && matched === 0;
+      var hasMore = matched > cols; // more than one row to reveal
+      // "See all" only when collapsed AND there's a second row to show.
+      if (s.btn) s.btn.style.display = !q && !s.expanded && hasMore ? "" : "none";
+      // Fade the row only while it's hiding more behind "See all".
+      if (s.grid) s.grid.classList.toggle("is-faded", !q && !s.expanded && hasMore);
     });
-    if (empty) empty.hidden = matched !== 0;
+    if (empty) empty.hidden = total !== 0;
     if (countEl) {
       var noun = countEl.dataset.noun || "item";
-      countEl.textContent = matched + " " + noun + (matched === 1 ? "" : "s");
+      countEl.textContent = total + " " + noun + (total === 1 ? "" : "s");
     }
-    syncSentinel();
   }
 
-  // Reveal the next batch when the sentinel scrolls into view (and there's more).
-  var sentinel = document.createElement("div");
-  sentinel.className = "gallery-sentinel";
-  sentinel.setAttribute("aria-hidden", "true");
-  gallery.parentNode.insertBefore(sentinel, gallery.nextSibling);
+  // Re-measure on width change — but only do DOM work when the column count
+  // actually changed (resizing within the same column count is a no-op).
+  var resizeRaf;
+  window.addEventListener("resize", function () {
+    if (resizeRaf) cancelAnimationFrame(resizeRaf);
+    resizeRaf = requestAnimationFrame(function () {
+      if (measureCols() === lastCols) return;
+      render();
+    });
+  });
 
-  function revealMore() {
-    if (limit >= matched) return;
-    limit += BATCH;
-    apply();
-  }
-  function syncSentinel() {
-    // Nothing left to reveal → hide the sentinel so the observer idles.
-    sentinel.style.display = limit >= matched ? "none" : "block";
-  }
-  if ("IntersectionObserver" in window) {
-    var io = new IntersectionObserver(
+  // "See all / Show less" toggles a section's preview cap (hydrating on first open).
+  sections.forEach(function (s) {
+    if (!s.btn) return;
+    s.btn.addEventListener("click", function () {
+      if (!s.hydrated) hydrate(s);
+      s.expanded = !s.expanded;
+      s.btn.setAttribute("aria-expanded", String(s.expanded));
+      s.btn.innerHTML = s.expanded
+        ? 'Show less <span aria-hidden="true">&uarr;</span>'
+        : "See all " + s.items.length + ' <span aria-hidden="true">&rarr;</span>';
+      render();
+    });
+  });
+
+  // Live search across every album in the bucket.
+  if (search) search.addEventListener("input", render);
+
+  // --- Rail scroll-spy -------------------------------------------------------
+  // Highlight the rail link for whichever section is centred in the viewport and
+  // keep it scrolled into view within the rail. Jumping itself is native anchor
+  // scrolling (CSS scroll-behavior + the section's scroll-margin-top).
+  if (rail && "IntersectionObserver" in window) {
+    var links = {};
+    Array.prototype.forEach.call(rail.querySelectorAll("a"), function (a) {
+      links[a.getAttribute("data-target")] = a;
+    });
+    var spy = new IntersectionObserver(
       function (entries) {
-        if (entries[0].isIntersecting) revealMore();
+        entries.forEach(function (e) {
+          if (!e.isIntersecting) return;
+          var a = links[e.target.id];
+          if (!a) return;
+          Object.keys(links).forEach(function (k) {
+            links[k].classList.remove("is-active");
+          });
+          a.classList.add("is-active");
+          a.scrollIntoView({ inline: "center", block: "nearest" });
+        });
       },
-      { rootMargin: "800px 0px" } // start a batch before it's actually visible
+      { rootMargin: "-45% 0px -50% 0px" }
     );
-    io.observe(sentinel);
-  } else {
-    // No IO support: just render everything (older browsers, graceful fallback).
-    limit = Infinity;
+    sections.forEach(function (s) {
+      spy.observe(s.el);
+    });
   }
 
-  function setAlbum(slug) {
-    album = slug || "all";
-    limit = WINDOW; // reset the window whenever the filter changes
-    if (chips) {
-      Array.prototype.forEach.call(chips.querySelectorAll(".gchip"), function (c) {
-        c.classList.toggle("is-active", c.dataset.album === album);
-      });
+  render();
+
+  // Back-compat: old deep links were /photography/#madrid; sections are now
+  // #album-madrid. Map a bare album slug to its section so those links still land.
+  if (location.hash) {
+    var h = location.hash.replace(/^#/, "");
+    if (h && !document.getElementById(h)) {
+      var el = document.getElementById("album-" + h);
+      if (el) el.scrollIntoView();
     }
-    apply();
   }
-
-  // --- Album chips -----------------------------------------------------------
-  if (chips) {
-    chips.addEventListener("click", function (e) {
-      var chip = e.target.closest(".gchip");
-      if (!chip) return;
-      setAlbum(chip.dataset.album);
-      var hash = album === "all" ? "" : "#" + album;
-      if (history.replaceState) {
-        history.replaceState(null, "", location.pathname + location.search + hash);
-      }
-    });
-  }
-
-  // --- Search (across every album in this bucket) ----------------------------
-  if (search)
-    search.addEventListener("input", function () {
-      limit = WINDOW; // a new query resets the render window to the top
-      apply();
-    });
-
-  // --- Deep link: /photography/#san-francisco pre-selects that album ---------
-  function openFromHash() {
-    var slug = (location.hash || "").replace(/^#/, "");
-    if (!slug || !chips) return;
-    var chip = chips.querySelector('.gchip[data-album="' + slug + '"]');
-    if (chip) setAlbum(slug);
-  }
-  openFromHash();
-  apply();
 })();
