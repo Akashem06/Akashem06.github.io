@@ -1,6 +1,6 @@
 ---
 company: Verkada
-title: Security Software Intern (Platform Devices)
+title: Security Software Intern
 company_url: https://www.verkada.com/
 logo: /assets/images/experiences/verkada.png
 location: San Mateo, CA

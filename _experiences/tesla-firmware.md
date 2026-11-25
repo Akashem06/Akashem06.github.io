@@ -1,6 +1,6 @@
 ---
 company: Tesla
-title: Firmware Platforms Intern (Vehicle Gateway)
+title: Firmware Platforms Intern
 company_url: https://www.tesla.com/
 logo: /assets/images/experiences/tesla.png
 location: Palo Alto, CA
